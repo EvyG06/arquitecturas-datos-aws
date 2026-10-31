@@ -1,0 +1,5 @@
+[
+  {"source_id": "eltiempo_politica", "medio": "El Tiempo", "seccion": "Política", "url": "https://www.eltiempo.com/rss/politica.xml"},
+  {"source_id": "eltiempo_economia", "medio": "El Tiempo", "seccion": "Economía", "url": "https://www.eltiempo.com/rss/economia.xml"},
+  {"source_id": "eltiempo_mundo",    "medio": "El Tiempo", "seccion": "Mundo",    "url": "https://www.eltiempo.com/rss/mundo.xml"}
+]
