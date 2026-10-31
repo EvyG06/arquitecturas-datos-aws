@@ -1,0 +1,34 @@
+name: ecommerce_dw
+version: '1.0.0'
+config-version: 2
+profile: ecommerce_dw
+
+model-paths: ["models"]
+test-paths: ["tests"]
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  ecommerce_dw:
+    intermediate:
+      +schema: intermediate
+      +materialized: view
+    quarantine:
+      +schema: quarantine
+      +materialized: table
+    marts:
+      +schema: marts
+      +materialized: table
+
+vars:
+  valid_sales_channels: ['web', 'móvil', 'tienda']
+  valid_event_types: ['vista_producto', 'busqueda', 'agregar_carrito']
+  business_timezone: 'America/Bogota'
+  date_dimension_start: '2025-01-01'
+  date_dimension_end: '2028-01-01'  # fin exclusivo, compatible con dbt_utils.date_spine
+  incremental_lookback_days: 7  # días recientes que se reprocesan para absorber datos tardíos
+
+seeds:
+  ecommerce_dw:
+    colombia_holidays:
+      +column_types:
+        date: date

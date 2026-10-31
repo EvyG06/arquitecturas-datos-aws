@@ -1,0 +1,111 @@
+version: 2
+
+models:
+  - name: stg_mysql__customers
+    description: Clientes tipados y renombrados 1:1 desde raw, sin filtrar filas.
+    columns:
+      - name: customer_id
+        tests: [unique, not_null]
+  - name: stg_mysql__products
+    description: Productos tipados y renombrados 1:1 desde raw, sin filtrar filas.
+    columns:
+      - name: product_id
+        tests: [unique, not_null]
+  - name: stg_mysql__orders
+    description: Pedidos tipados y renombrados 1:1 desde raw, sin filtrar filas.
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+  - name: stg_mysql__order_items
+    description: Líneas de pedido tipados y renombrados 1:1 desde raw, sin filtrar filas.
+    columns:
+      - name: order_item_id
+        tests: [unique, not_null]
+  - name: stg_mongodb__reviews
+    description: Reseñas tipados y renombrados 1:1 desde raw, sin filtrar filas.
+    columns:
+      - name: review_id
+        tests: [unique, not_null]
+  - name: stg_mongodb__navigation_events
+    description: Eventos de navegación tipados y renombrados 1:1 desde raw, sin filtrar filas.
+    columns:
+      - name: event_id
+        tests: [unique, not_null]
+  - name: int_mysql__customers__qa
+    description: Clientes con su motivo de rechazo de calidad en rejection_reason (nulo si son válidos).
+    columns:
+      - name: rejection_reason
+        description: Primera regla incumplida, o nulo si la fila es válida.
+        tests:
+          - accepted_values:
+              values: ['missing_name', 'invalid_email']
+  - name: int_mysql__products__qa
+    description: Productos con su motivo de rechazo de calidad en rejection_reason (nulo si son válidos).
+    columns:
+      - name: rejection_reason
+        description: Primera regla incumplida, o nulo si la fila es válida.
+        tests:
+          - accepted_values:
+              values: ['missing_category', 'negative_price']
+  - name: int_mysql__orders__qa
+    description: Pedidos con su motivo de rechazo de calidad en rejection_reason (nulo si son válidos).
+    columns:
+      - name: rejection_reason
+        description: Primera regla incumplida, o nulo si la fila es válida.
+        tests:
+          - accepted_values:
+              values: ['orphan_customer', 'invalid_sales_channel', 'negative_total']
+  - name: int_mysql__order_items__qa
+    description: Líneas de pedido con su motivo de rechazo de calidad en rejection_reason (nulo si son válidos).
+    columns:
+      - name: rejection_reason
+        description: Primera regla incumplida, o nulo si la fila es válida.
+        tests:
+          - accepted_values:
+              values: ['orphan_order', 'orphan_product', 'invalid_quantity', 'subtotal_mismatch']
+  - name: int_mongodb__reviews__qa
+    description: Reseñas con su motivo de rechazo de calidad en rejection_reason (nulo si son válidos).
+    columns:
+      - name: rejection_reason
+        description: Primera regla incumplida, o nulo si la fila es válida.
+        tests:
+          - accepted_values:
+              values: ['invalid_rating', 'missing_reviewed_at', 'orphan_customer', 'orphan_product']
+  - name: int_mongodb__navigation_events__qa
+    description: Eventos de navegación con su motivo de rechazo de calidad en rejection_reason (nulo si son válidos).
+    columns:
+      - name: rejection_reason
+        description: Primera regla incumplida, o nulo si la fila es válida.
+        tests:
+          - accepted_values:
+              values: ['invalid_event_type', 'missing_occurred_at', 'orphan_product', 'orphan_customer', 'invalid_sales_channel']
+  - name: int_mysql__customers__valid
+    description: Clientes válidos. Es la única entrada de snapshots y marts para esta entidad.
+    columns:
+      - name: customer_id
+        tests: [unique, not_null]
+  - name: int_mysql__products__valid
+    description: Productos válidos. Es la única entrada de snapshots y marts para esta entidad.
+    columns:
+      - name: product_id
+        tests: [unique, not_null]
+  - name: int_mysql__orders__valid
+    description: Pedidos válidos. Es la única entrada de snapshots y marts para esta entidad.
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+  - name: int_mysql__order_items__valid
+    description: Líneas de pedido válidos. Es la única entrada de snapshots y marts para esta entidad.
+    columns:
+      - name: order_item_id
+        tests: [unique, not_null]
+  - name: int_mongodb__reviews__valid
+    description: Reseñas válidos. Es la única entrada de snapshots y marts para esta entidad.
+    columns:
+      - name: review_id
+        tests: [unique, not_null]
+  - name: int_mongodb__navigation_events__valid
+    description: Eventos de navegación válidos. Es la única entrada de snapshots y marts para esta entidad.
+    columns:
+      - name: event_id
+        tests: [unique, not_null]

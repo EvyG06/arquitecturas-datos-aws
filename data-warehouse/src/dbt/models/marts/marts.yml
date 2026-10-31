@@ -1,0 +1,145 @@
+version: 2
+
+models:
+  - name: dim_customer
+    description: Clientes con SCD tipo 2. Cada versión se abre cuando cambia updated_at en MySQL.
+    columns:
+      - name: customer_sk
+        tests: [unique, not_null]
+      - name: valid_from
+        tests: [not_null]
+      - name: is_current
+        tests: [not_null]
+  - name: dim_product
+    description: Productos con SCD tipo 2. Cada versión se abre cuando cambia updated_at en MySQL.
+    columns:
+      - name: product_sk
+        tests: [unique, not_null]
+      - name: valid_from
+        tests: [not_null]
+      - name: is_current
+        tests: [not_null]
+  - name: dim_date
+    description: Calendario fijo con festivos de Colombia.
+    columns:
+      - name: date_sk
+        tests: [unique, not_null]
+  - name: dim_geography
+    description: Jerarquía país, departamento y ciudad.
+    columns:
+      - name: geography_sk
+        tests: [unique, not_null]
+  - name: dim_sales_channel
+    description: Canales de venta presentes en órdenes y eventos válidos (SCD tipo 1).
+    columns:
+      - name: sales_channel_sk
+        tests: [unique, not_null]
+  - name: dim_event_type
+    description: Tipos de evento de navegación válidos (SCD tipo 1).
+    columns:
+      - name: event_type_sk
+        tests: [unique, not_null]
+      - name: event_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: "{{ var('valid_event_types') }}"
+  - name: fct_sales
+    description: Una fila por línea de pedido de MySQL. Carga incremental con delete+insert por sale_sk y ventana de reproceso de 7 días.
+    columns:
+      - name: sale_sk
+        tests: [unique, not_null]
+      - name: customer_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_customer')
+              field: customer_sk
+      - name: product_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_product')
+              field: product_sk
+      - name: sales_channel_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_sales_channel')
+              field: sales_channel_sk
+      - name: date_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_sk
+      - name: geography_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_geography')
+              field: geography_sk
+  - name: fct_reviews
+    description: Una fila por reseña de MongoDB. Grano una reseña. Carga incremental con delete+insert por review_sk y ventana de reproceso de 7 días.
+    columns:
+      - name: review_sk
+        tests: [unique, not_null]
+      - name: customer_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_customer')
+              field: customer_sk
+      - name: product_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_product')
+              field: product_sk
+      - name: date_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_sk
+      - name: rating
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+              max_value: 5
+              inclusive: true
+  - name: fct_navigation_events
+    description: Factless fact con una fila por evento de navegación. customer_sk es nulo en eventos anónimos. Carga incremental con delete+insert por navigation_event_sk y ventana de reproceso de 7 días.
+    columns:
+      - name: navigation_event_sk
+        tests: [unique, not_null]
+      - name: customer_sk
+        tests:
+          - relationships:
+              to: ref('dim_customer')
+              field: customer_sk
+      - name: product_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_product')
+              field: product_sk
+      - name: date_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_sk
+      - name: sales_channel_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_sales_channel')
+              field: sales_channel_sk
+      - name: event_type_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_event_type')
+              field: event_type_sk

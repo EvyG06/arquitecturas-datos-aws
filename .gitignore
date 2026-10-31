@@ -1,0 +1,12 @@
+.env
+env_file
+*.pem
+infra/budget/notifications.json
+.venv/
+__pycache__/
+.DS_Store
+data-warehouse/warehouse/
+data-warehouse/src/dbt/target/
+data-warehouse/src/dbt/dbt_packages/
+data-warehouse/src/dbt/logs/
+.user.yml

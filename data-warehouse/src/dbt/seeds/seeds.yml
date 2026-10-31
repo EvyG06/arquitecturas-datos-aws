@@ -1,0 +1,19 @@
+version: 2
+
+seeds:
+  - name: colombia_municipalities
+    description: Ciudades y departamentos colombianos para la dimensión geográfica.
+    columns:
+      - name: country
+        tests: [not_null]
+      - name: department
+        tests: [not_null]
+      - name: city
+        tests: [not_null]
+  - name: colombia_holidays
+    description: "Calendario nacional de 2025: 18 festivos en 17 fechas distintas; dos celebraciones coinciden el 30 de junio. Referencia: https://colombiafestivos.com.co/festivos-2025"
+    columns:
+      - name: date
+        tests: [unique, not_null]
+      - name: holiday_name
+        tests: [not_null]

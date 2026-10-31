@@ -1,0 +1,8 @@
+ecommerce_dw:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      path: /opt/warehouse/warehouse.duckdb
+      schema: intermediate
+      threads: 1
