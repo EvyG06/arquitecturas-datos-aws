@@ -5,3 +5,4 @@ export PROJECT=arquitecturas-datos
 export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 export DL_BUCKET="eve-dl-${ACCOUNT_ID}-${AWS_REGION}"
 export DW_BUCKET="eve-dw-${ACCOUNT_ID}-${AWS_REGION}"
+export AWS_PAGER=""
