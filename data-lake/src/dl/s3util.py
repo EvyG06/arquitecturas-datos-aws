@@ -43,3 +43,29 @@ def head(s3, bucket: str, key: str) -> dict | None:
         if _http(err) == 404:
             return None
         raise
+
+
+class ConcurrentUpdate(RuntimeError):
+    """Otro proceso modifico el objeto entre la lectura y la escritura."""
+
+
+def read_json_etag(s3, bucket: str, key: str) -> tuple[Any | None, str | None]:
+    try:
+        obj = s3.get_object(Bucket=bucket, Key=key)
+        return json.loads(obj["Body"].read()), obj["ETag"]
+    except ClientError as err:
+        if err.response["Error"]["Code"] in ("NoSuchKey", "404"):
+            return None, None
+        raise
+
+
+def put_json_cas(s3, bucket: str, key: str, obj: Any, etag: str | None) -> None:
+    """Escritura compare-and-swap: solo escribe si el objeto sigue como cuando se leyo."""
+    body = json.dumps(obj, ensure_ascii=False, indent=2, default=str).encode("utf-8")
+    condition = {"IfMatch": etag} if etag else {"IfNoneMatch": "*"}
+    try:
+        s3.put_object(Bucket=bucket, Key=key, Body=body, ContentType="application/json", **condition)
+    except ClientError as err:
+        if _http(err) in (404, 409, 412):
+            raise ConcurrentUpdate(f"{key} cambio desde que se leyo, hay que reintentar") from err
+        raise

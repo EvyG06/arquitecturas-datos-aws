@@ -32,7 +32,7 @@ def utc_now() -> datetime:
 
 
 def iso(dt: datetime) -> str:
-    return dt.astimezone(timezone.utc).isoformat(timespec="seconds")
+    return dt.astimezone(timezone.utc).isoformat(timespec="milliseconds")
 
 
 def fetch(url: str) -> tuple[int, str, bytes]:
