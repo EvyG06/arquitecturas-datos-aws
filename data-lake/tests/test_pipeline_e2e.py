@@ -52,7 +52,7 @@ def state(s3):
     return json.loads(s3.get_object(Bucket=BUCKET, Key=silver.STATE_KEY)["Body"].read())
 
 
-def test_escenarios_bronze_silver(env):
+def test_escenarios_bronze_silver(env, fake_nlp):
     s3, feeds = env
     feeds["https://p.test"] = feed(item(1000001, "A"), item(1000002, "B"), item(1000003, "C", pub="ayer"))
     feeds["https://m.test"] = feed(item(1000002, "B"), item(1000004, "D", pub="2026-10-30T20:00:00-05:00"))
@@ -60,23 +60,29 @@ def test_escenarios_bronze_silver(env):
     feeds["https://p.test"] = feed(item(1000001, "A editada"), item(1000005, "E"))
     ingest.ingest_all(SOURCES, "r2", s3=s3)
 
-    r1 = silver.process_run("r1", s3=s3)
+    r1 = silver.process_run("r1", s3=s3, nlp=fake_nlp)
     assert (r1["rechazados"], r1["duplicados_en_lote"]) == (1, 1)
     assert counts(r1) == {"nuevas": 3, "repetidas": 0, "actualizadas": 0, "obsoletas": 0}
-    r2 = silver.process_run("r2", s3=s3)
+    r2 = silver.process_run("r2", s3=s3, nlp=fake_nlp)
     assert counts(r2) == {"nuevas": 1, "repetidas": 2, "actualizadas": 1, "obsoletas": 0}
+    assert r1["nlp"]["textos_enviados"] == 3
+    assert r2["nlp"]["textos_enviados"] == 2 and r2["nlp"]["cache_hits"] == 1
 
-    assert silver.process_run("r1", s3=s3)["skipped"]
-    forced = silver.process_run("r1", s3=s3, force=True)
+    assert silver.process_run("r1", s3=s3, nlp=fake_nlp)["skipped"]
+    forced = silver.process_run("r1", s3=s3, force=True, nlp=fake_nlp)
     assert forced["obsoletas"] == 1 and forced["particiones_afectadas"] == []
     history = state(s3)["processed_runs"]["r1"]
     assert history["procesamientos"] == 2 and history["primero"]["nuevas"] == 3
 
+    calls_before_rebuild = dict(fake_nlp.calls)
     before = state(s3)
-    silver.rebuild(s3=s3)
+    silver.rebuild(s3=s3, nlp=fake_nlp)
+    assert dict(fake_nlp.calls) == calls_before_rebuild
     after = state(s3)
     assert after["build_id"] != before["build_id"]
     rows = silver.load_current(s3, BUCKET, after)
     assert sorted(rows) == ["1000001", "1000002", "1000004", "1000005"]
     assert (rows["1000001"]["title"], rows["1000001"]["version"]) == ("A editada", 2)
     assert rows["1000002"]["sources_seen"] == ["eltiempo_mundo", "eltiempo_politica"]
+    assert rows["1000001"]["nlp_status"] == "analizado" and rows["1000001"]["nlp_language"] == "es"
+    assert set(after["datasets"]["news_entities"]) == set(after["datasets"]["news"])

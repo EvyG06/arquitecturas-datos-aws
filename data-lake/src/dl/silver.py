@@ -1,4 +1,4 @@
-"""Capa Silver: de un lote de Bronze a noticias vigentes en Parquet."""
+"""Capa Silver: de un lote de Bronze a noticias vigentes enriquecidas, en Parquet."""
 from __future__ import annotations
 
 import argparse
@@ -15,6 +15,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from dl.config import bucket
+from dl.enrich import PENDING, enrich_rows, entity_rows, key_phrase_rows
 from dl.parse import parse_feed
 from dl.s3util import ConcurrentUpdate, put_json, put_json_cas, read_json, read_json_etag
 
@@ -23,7 +24,8 @@ log = logging.getLogger("dl.silver")
 STATE_KEY = "_control/silver/state.json"
 OK = {"ok", "ok_no_items"}
 KEEP_ON_UPDATE = ("source_id", "medio", "seccion", "first_seen_run_id")
-TS_FIELDS = ("published_at_utc", "content_ingested_at_utc")
+TS_FIELDS = ("published_at_utc", "content_ingested_at_utc", "nlp_analyzed_at_utc")
+DATASETS = ("news", "news_entities", "news_key_phrases")
 
 NEWS_SCHEMA = pa.schema([
     ("news_id", pa.string()),
@@ -47,7 +49,32 @@ NEWS_SCHEMA = pa.schema([
     ("content_ingested_at_utc", pa.timestamp("ms")),
     ("bronze_uri", pa.string()),
     ("item_position", pa.int32()),
+    ("nlp_status", pa.string()),
+    ("nlp_language", pa.string()),
+    ("nlp_language_score", pa.float64()),
+    ("nlp_analyzed_at_utc", pa.timestamp("ms")),
 ])
+
+ENTITY_SCHEMA = pa.schema([
+    ("news_id", pa.string()),
+    ("text_hash", pa.string()),
+    ("entity_type", pa.string()),
+    ("entity_text", pa.string()),
+    ("entity_norm", pa.string()),
+    ("score", pa.float64()),
+    ("mentions", pa.int32()),
+])
+
+KEY_PHRASE_SCHEMA = pa.schema([
+    ("news_id", pa.string()),
+    ("text_hash", pa.string()),
+    ("phrase_text", pa.string()),
+    ("phrase_norm", pa.string()),
+    ("score", pa.float64()),
+    ("mentions", pa.int32()),
+])
+
+SCHEMAS = {"news": NEWS_SCHEMA, "news_entities": ENTITY_SCHEMA, "news_key_phrases": KEY_PHRASE_SCHEMA}
 
 
 def utc_now() -> datetime:
@@ -115,15 +142,16 @@ def _naive_utc(dt: datetime) -> datetime:
     return dt.astimezone(timezone.utc).replace(tzinfo=None)
 
 
-def write_news_partition(s3, bkt: str, key: str, rows: list[dict]) -> None:
+def write_partition(s3, bkt: str, key: str, rows: list[dict], schema: pa.Schema) -> None:
     prepared = []
-    for r in sorted(rows, key=lambda r: r["news_id"]):
-        row = {f.name: r.get(f.name) for f in NEWS_SCHEMA}
+    for r in rows:
+        row = {f.name: r.get(f.name) for f in schema}
         for k in TS_FIELDS:
-            row[k] = _naive_utc(row[k])
+            if row.get(k) is not None:
+                row[k] = _naive_utc(row[k])
         prepared.append(row)
     buf = io.BytesIO()
-    pq.write_table(pa.Table.from_pylist(prepared, schema=NEWS_SCHEMA), buf, compression="snappy")
+    pq.write_table(pa.Table.from_pylist(prepared, schema=schema), buf, compression="snappy")
     s3.put_object(Bucket=bkt, Key=key, Body=buf.getvalue(), ContentType="application/vnd.apache.parquet")
 
 
@@ -133,7 +161,8 @@ def load_current(s3, bkt: str, state: dict) -> dict[str, dict]:
         body = s3.get_object(Bucket=bkt, Key=key)["Body"].read()
         for r in pq.read_table(io.BytesIO(body)).to_pylist():
             for k in TS_FIELDS:
-                r[k] = r[k].replace(tzinfo=timezone.utc)
+                if r.get(k) is not None:
+                    r[k] = r[k].replace(tzinfo=timezone.utc)
             r["pub_date"] = date.fromisoformat(day)
             rows[r["news_id"]] = r
     return rows
@@ -170,12 +199,14 @@ def build_id() -> str:
 
 
 def new_state(build: str) -> dict:
-    return {"build_id": build, "datasets": {"news": {}}, "processed_runs": {}}
+    return {"build_id": build, "datasets": {ds: {} for ds in DATASETS}, "processed_runs": {}}
 
 
-def apply_run(s3, bkt: str, state: dict, run_id: str) -> dict:
+def apply_run(s3, bkt: str, state: dict, run_id: str, nlp=None) -> dict:
     """Aplica un lote de Bronze al estado en memoria y escribe sus archivos. No confirma el estado."""
     build = state["build_id"]
+    for ds in DATASETS:
+        state["datasets"].setdefault(ds, {})
     run, valid, rejected, received, sources = load_batch(s3, bkt, run_id)
     batch, duplicates = dedup_batch(valid)
     current = load_current(s3, bkt, state)
@@ -184,13 +215,29 @@ def apply_run(s3, bkt: str, state: dict, run_id: str) -> dict:
     by_day: dict[date, list[dict]] = defaultdict(list)
     for row in current.values():
         by_day[row["pub_date"]].append(row)
-    for day in sorted(touched):
-        key = f"silver/news/pub_date={day.isoformat()}/v={build}-{run_id}/part-00000.parquet"
-        if by_day.get(day):
-            write_news_partition(s3, bkt, key, by_day[day])
-            state["datasets"]["news"][day.isoformat()] = key
-        else:
-            state["datasets"]["news"].pop(day.isoformat(), None)
+    retry_days = {d for d, rows in by_day.items()
+                  if any(r.get("nlp_status") is None or r.get("nlp_status") in PENDING for r in rows)}
+    to_write = touched | retry_days
+
+    nlp_stats: Counter = Counter()
+    entity_count = phrase_count = 0
+    for day in sorted(to_write):
+        iso_day = day.isoformat()
+        rows = sorted(by_day.get(day, []), key=lambda r: r["news_id"])
+        if not rows:
+            for ds in DATASETS:
+                state["datasets"][ds].pop(iso_day, None)
+            continue
+        results, day_stats = enrich_rows(s3, bkt, rows, nlp)
+        nlp_stats.update(day_stats)
+        entities = [e for r in rows for e in entity_rows(r, results[r["text_hash"]])]
+        phrases = [k for r in rows for k in key_phrase_rows(r, results[r["text_hash"]])]
+        entity_count += len(entities)
+        phrase_count += len(phrases)
+        for ds, data in (("news", rows), ("news_entities", entities), ("news_key_phrases", phrases)):
+            key = f"silver/{ds}/pub_date={iso_day}/v={build}-{run_id}/part-00000.parquet"
+            write_partition(s3, bkt, key, data, SCHEMAS[ds])
+            state["datasets"][ds][iso_day] = key
 
     if rejected:
         lines = "\n".join(json.dumps(r, ensure_ascii=False) for r in rejected) + "\n"
@@ -212,6 +259,10 @@ def apply_run(s3, bkt: str, state: dict, run_id: str) -> dict:
         "noticias_unicas_en_lote": len(batch),
         **stats,
         "particiones_afectadas": sorted(d.isoformat() for d in touched),
+        "particiones_escritas": sorted(d.isoformat() for d in to_write),
+        "nlp": dict(nlp_stats),
+        "entidades_en_particiones_escritas": entity_count,
+        "frases_en_particiones_escritas": phrase_count,
         "noticias_vigentes_total": len(current),
     }
     check_invariants(report)
@@ -220,6 +271,7 @@ def apply_run(s3, bkt: str, state: dict, run_id: str) -> dict:
 
     summary = {k: report[k] for k in ("processed_at_utc", "build_id", "nuevas", "repetidas",
                                       "actualizadas", "obsoletas", "rechazados")}
+    summary["textos_enviados_comprehend"] = nlp_stats.get("textos_enviados", 0)
     entry = state["processed_runs"].get(run_id)
     if entry is None or "primero" not in entry:
         state["processed_runs"][run_id] = {"primero": summary, "ultimo": summary, "procesamientos": 1}
@@ -227,12 +279,13 @@ def apply_run(s3, bkt: str, state: dict, run_id: str) -> dict:
         entry.update(ultimo=summary, procesamientos=entry["procesamientos"] + 1)
 
     log.info("task=silver run_id=%s build=%s nuevas=%s repetidas=%s actualizadas=%s obsoletas=%s "
-             "rechazados=%s particiones=%s", run_id, build, stats["nuevas"], stats["repetidas"],
-             stats["actualizadas"], stats["obsoletas"], len(rejected), report["particiones_afectadas"])
+             "rechazados=%s particiones=%s comprehend_textos=%s cache_hits=%s", run_id, build,
+             stats["nuevas"], stats["repetidas"], stats["actualizadas"], stats["obsoletas"], len(rejected),
+             report["particiones_escritas"], nlp_stats.get("textos_enviados", 0), nlp_stats.get("cache_hits", 0))
     return report
 
 
-def process_run(run_id: str, s3=None, force: bool = False) -> dict:
+def process_run(run_id: str, s3=None, force: bool = False, nlp=None) -> dict:
     """Procesa un lote sobre el estado vigente y confirma con compare-and-swap."""
     s3 = s3 or boto3.client("s3")
     bkt = bucket()
@@ -242,7 +295,7 @@ def process_run(run_id: str, s3=None, force: bool = False) -> dict:
     if run_id in state["processed_runs"] and not force:
         log.info("task=silver run_id=%s ya procesado, se omite", run_id)
         return {**state["processed_runs"][run_id], "skipped": True}
-    report = apply_run(s3, bkt, state, run_id)
+    report = apply_run(s3, bkt, state, run_id, nlp)
     put_json_cas(s3, bkt, STATE_KEY, state, etag)
     return report
 
@@ -265,13 +318,13 @@ def pending_runs(s3, bkt: str) -> list[str]:
     return [r for r in bronze_runs(s3, bkt) if r not in done]
 
 
-def rebuild(s3=None) -> list[dict]:
+def rebuild(s3=None, nlp=None) -> list[dict]:
     """Reconstruye Silver completo desde Bronze en un build nuevo y lo confirma de una sola vez."""
     s3 = s3 or boto3.client("s3")
     bkt = bucket()
     _, etag = read_json_etag(s3, bkt, STATE_KEY)
     state = new_state(build_id())
-    reports = [apply_run(s3, bkt, state, run_id) for run_id in bronze_runs(s3, bkt)]
+    reports = [apply_run(s3, bkt, state, run_id, nlp) for run_id in bronze_runs(s3, bkt)]
     put_json_cas(s3, bkt, STATE_KEY, state, etag)
     log.info("task=silver rebuild build=%s lotes=%s vigentes=%s", state["build_id"], len(reports),
              reports[-1]["noticias_vigentes_total"] if reports else 0)
