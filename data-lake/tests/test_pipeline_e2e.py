@@ -86,3 +86,24 @@ def test_escenarios_bronze_silver(env, fake_nlp):
     assert rows["1000002"]["sources_seen"] == ["eltiempo_mundo", "eltiempo_politica"]
     assert rows["1000001"]["nlp_status"] == "analizado" and rows["1000001"]["nlp_language"] == "es"
     assert set(after["datasets"]["news_entities"]) == set(after["datasets"]["news"])
+
+
+def test_gold_es_incremental_e_idempotente(env, fake_nlp):
+    from dl import gold
+    s3, feeds = env
+    feeds["https://p.test"] = feed(item(1000001, "Ana visita Lima"), item(1000002, "Luis en Quito",
+                                                                           pub="2026-10-30T09:00:00-05:00"))
+    feeds["https://m.test"] = feed(item(1000003, "Eva y Ana en Roma"))
+    ingest.ingest_all(SOURCES, "r1", s3=s3)
+    silver.process_run("r1", s3=s3, nlp=fake_nlp)
+
+    first = gold.build(s3=s3)
+    assert first["fechas_recalculadas"] == ["2026-10-30", "2026-10-31"]
+    assert first["conciliacion"]["2026-10-31"]["noticias"] == 2
+    assert gold.build(s3=s3)["fechas_recalculadas"] == []
+
+    feeds["https://p.test"] = feed(item(1000004, "Nueva nota de Ana"))
+    feeds["https://m.test"] = feed()
+    ingest.ingest_all(SOURCES, "r2", s3=s3)
+    silver.process_run("r2", s3=s3, nlp=fake_nlp)
+    assert gold.build(s3=s3)["fechas_recalculadas"] == ["2026-10-31"]
