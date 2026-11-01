@@ -66,7 +66,8 @@ def start_run(s3, bkt: str, run_id: str) -> datetime:
     return datetime.fromisoformat(read_json(s3, bkt, key)["run_ts_utc"])
 
 
-def ingest_source(s3, bkt: str, src: Source, run_id: str, run_ts: datetime, attempt: int = 1) -> dict:
+def ingest_source(s3, bkt: str, src: Source, run_id: str, run_ts: datetime, attempt: int = 1,
+                  fetcher=None, extra: dict | None = None) -> dict:
     day = run_ts.date().isoformat()
     part = f"source={src.source_id}/ingestion_date={day}/run_id={run_id}"
     raw_key = f"bronze/{part}/feed.xml"
@@ -80,7 +81,8 @@ def ingest_source(s3, bkt: str, src: Source, run_id: str, run_ts: datetime, atte
         return {**previous, "skipped": True}
 
     rec = {"run_id": run_id, "source_id": src.source_id, "medio": src.medio,
-           "seccion": src.seccion, "url": src.url, "ingestion_date": day, "attempt": attempt}
+           "seccion": src.seccion, "url": src.url, "ingestion_date": day, "attempt": attempt,
+           **(extra or {})}
 
     stored = head(s3, bkt, raw_key)
     if stored:
@@ -89,7 +91,7 @@ def ingest_source(s3, bkt: str, src: Source, run_id: str, run_ts: datetime, atte
                    note="original ya existia en Bronze, registro completado sin consultar la fuente")
     else:
         try:
-            code, ctype, body = fetch(src.url)
+            code, ctype, body = (fetcher or fetch)(src.url)
         except (requests.RequestException, urllib3.exceptions.HTTPError) as err:
             rec.update(status="network_error", http_status=None, error=f"{type(err).__name__}: {err}"[:300])
             put_json(s3, bkt, control_key, rec)
@@ -131,11 +133,12 @@ def run_status(results: list[dict]) -> str:
     return "partial" if ok else "failed"
 
 
-def ingest_all(sources: list[Source], run_id: str, attempt: int = 1, s3=None) -> dict:
+def ingest_all(sources: list[Source], run_id: str, attempt: int = 1, s3=None,
+               fetcher=None, extra: dict | None = None) -> dict:
     s3 = s3 or boto3.client("s3")
     bkt = bucket()
     run_ts = start_run(s3, bkt, run_id)
-    results = [ingest_source(s3, bkt, src, run_id, run_ts, attempt) for src in sources]
+    results = [ingest_source(s3, bkt, src, run_id, run_ts, attempt, fetcher, extra) for src in sources]
     summary = {
         "run_id": run_id,
         "run_ts_utc": iso(run_ts),
@@ -152,10 +155,12 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Ingesta RSS a Bronze")
     p.add_argument("--run-id")
     p.add_argument("--config", type=Path, default=DEFAULT_SOURCES)
+    p.add_argument("--attempt", type=int, default=1, help="numero de intento, Airflow pasa try_number")
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+    logging.getLogger("botocore").setLevel(logging.WARNING)
     run_id = safe_run_id(args.run_id or "manual__" + utc_now().strftime("%Y%m%dT%H%M%SZ"))
-    summary = ingest_all(load_sources(args.config), run_id)
+    summary = ingest_all(load_sources(args.config), run_id, attempt=args.attempt)
     print(json.dumps(summary, ensure_ascii=False, indent=2))
     return {"complete": 0, "partial": 2, "failed": 1}[summary["status"]]
 

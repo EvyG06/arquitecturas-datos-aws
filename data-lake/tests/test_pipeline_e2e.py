@@ -37,7 +37,8 @@ def env(monkeypatch):
     base = datetime(2026, 10, 31, 23, 0, tzinfo=timezone.utc)
     monkeypatch.setattr(ingest, "utc_now", lambda: base + timedelta(seconds=next(ticks)))
     feeds: dict[str, bytes] = {}
-    monkeypatch.setattr(ingest, "fetch", lambda url: (200, "text/xml", feeds[url]))
+    monkeypatch.setattr(ingest, "fetch", lambda url: (feeds[url], "text/html", b"")
+                        if isinstance(feeds[url], int) else (200, "text/xml", feeds[url]))
     with mock_aws():
         s3 = boto3.client("s3")
         s3.create_bucket(Bucket=BUCKET, CreateBucketConfiguration={"LocationConstraint": "us-east-2"})
@@ -107,3 +108,52 @@ def test_gold_es_incremental_e_idempotente(env, fake_nlp):
     ingest.ingest_all(SOURCES, "r2", s3=s3)
     silver.process_run("r2", s3=s3, nlp=fake_nlp)
     assert gold.build(s3=s3)["fechas_recalculadas"] == ["2026-10-31"]
+
+
+
+def keys(s3, prefix):
+    out = []
+    for page in s3.get_paginator("list_objects_v2").paginate(Bucket=BUCKET, Prefix=prefix):
+        out += [o["Key"] for o in page.get("Contents", [])]
+    return out
+
+
+def test_copia_controlada_fuente_caida_y_fallo_controlado(env, fake_nlp, monkeypatch):
+    from dl import controlled
+    from dl.config import ControlledFault
+    s3, feeds = env
+    feeds["https://p.test"] = feed(item(1000001, "Ana en Lima"), item(1000002, "Luis en Quito"))
+    feeds["https://m.test"] = feed(item(1000003, "Eva en Roma"))
+    ingest.ingest_all(SOURCES, "r1", s3=s3)
+    silver.process_run("r1", s3=s3, nlp=fake_nlp)
+
+    out = controlled.run_controlled(s3, BUCKET, SOURCES[0], "r1", "ctl")
+    assert out["ingesta"]["status"] == "complete"
+    meta_key = [k for k in keys(s3, "bronze/") if "run_id=ctl/" in k and k.endswith("_meta.json")][0]
+    assert json.loads(s3.get_object(Bucket=BUCKET, Key=meta_key)["Body"].read())["origen"] == "copia_controlada"
+    rep = silver.process_run("ctl", s3=s3, nlp=fake_nlp)
+    assert (rep["items_recibidos"], rep["rechazados"], rep["duplicados_en_lote"]) == (6, 3, 1)
+    assert counts(rep) == {"nuevas": 0, "repetidas": 1, "actualizadas": 1, "obsoletas": 0}
+    assert rep["nlp"]["textos_enviados"] == 1
+    assert keys(s3, "quarantine/silver/run_id=ctl/") == ["quarantine/silver/run_id=ctl/rechazos.jsonl"]
+
+    feeds["https://p.test"] = feed(item(1000004, "Nueva de Ana"))
+    feeds["https://m.test"] = 503
+    assert ingest.ingest_all(SOURCES, "r2", s3=s3)["status"] == "partial"
+    feeds["https://m.test"] = feed(item(1000005, "Otra de Eva"))
+    assert ingest.ingest_all(SOURCES, "r2", attempt=2, s3=s3)["status"] == "complete"
+    assert len([k for k in keys(s3, "bronze/") if "run_id=r2/" in k and k.endswith("feed.xml")]) == 2
+
+    before = state(s3)
+    monkeypatch.setenv("DL_FAULT", "silver_antes_de_publicar")
+    with pytest.raises(ControlledFault):
+        silver.process_run("r2", s3=s3, nlp=fake_nlp)
+    assert state(s3) == before
+    assert keys(s3, "_control/silver/run_id=r2/") == []
+    written = set(keys(s3, "silver/"))
+    monkeypatch.delenv("DL_FAULT")
+    rep = silver.process_run("r2", s3=s3, nlp=fake_nlp)
+    assert rep["nuevas"] == 2
+    assert set(keys(s3, "silver/")) == written
+    assert state(s3)["processed_runs"]["r2"]["procesamientos"] == 1
+    assert len(keys(s3, "_control/silver/run_id=r2/")) == 1

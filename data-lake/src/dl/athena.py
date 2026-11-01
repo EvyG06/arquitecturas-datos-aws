@@ -49,12 +49,18 @@ def render(result: dict) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(description="Ejecuta archivos .sql en Athena")
-    p.add_argument("files", nargs="+", type=Path)
+    p = argparse.ArgumentParser(description="Ejecuta consultas SQL en Athena")
+    p.add_argument("files", nargs="*", type=Path, help="archivos .sql")
+    p.add_argument("-e", "--execute", action="append", default=[], metavar="SQL", help="consulta en linea")
     args = p.parse_args(argv)
+    if not args.files and not args.execute:
+        p.error("indica al menos un archivo .sql o una consulta con -e")
     for f in args.files:
         print(f"\n== {f.name}")
         print(render(run(f.read_text(encoding="utf-8"))))
+    for sql in args.execute:
+        print(f"\n== {' '.join(sql.split())[:110]}")
+        print(render(run(sql)))
     return 0
 
 

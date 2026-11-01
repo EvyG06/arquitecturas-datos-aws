@@ -41,3 +41,12 @@ def bucket() -> str:
 
 def safe_run_id(raw: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]", "_", raw)
+
+
+class ControlledFault(RuntimeError):
+    """Fallo inyectado a proposito para demostrar recuperacion. Se activa con la variable DL_FAULT."""
+
+
+def fault_point(name: str, context: str = "") -> None:
+    if os.environ.get("DL_FAULT") == name:
+        raise ControlledFault(f"fallo controlado en {name} {context}".strip())

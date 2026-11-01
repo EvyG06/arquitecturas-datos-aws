@@ -14,7 +14,7 @@ import boto3
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from dl.config import bucket
+from dl.config import ControlledFault, bucket, fault_point
 from dl.s3util import ConcurrentUpdate, put_json, put_json_cas, read_json_etag
 from dl.silver import STATE_KEY as SILVER_STATE_KEY
 from dl.silver import write_partition
@@ -145,8 +145,9 @@ def build(s3=None) -> dict:
               "fechas_sin_cambios": len(days) - len(recomputed), "conciliacion": conciliation}
     if recomputed or removed:
         gold.update(silver_build_id=silver.get("build_id"), updated_at_utc=report["built_at_utc"])
-        put_json(s3, bkt, f"_control/gold/runs/{now.strftime('%Y%m%dT%H%M%SZ')}.json", report)
+        fault_point("gold_antes_de_publicar")
         put_json_cas(s3, bkt, GOLD_STATE_KEY, gold, etag)
+        put_json(s3, bkt, f"_control/gold/runs/{now.strftime('%Y%m%dT%H%M%SZ')}.json", report)
     log.info("task=gold recalculadas=%s eliminadas=%s sin_cambios=%s",
              recomputed, removed, report["fechas_sin_cambios"])
     return report
@@ -155,11 +156,15 @@ def build(s3=None) -> dict:
 def main(argv: list[str] | None = None) -> int:
     argparse.ArgumentParser(description="Silver a Gold").parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+    logging.getLogger("botocore").setLevel(logging.WARNING)
     try:
         report = build()
     except ConcurrentUpdate as err:
         log.error("task=gold %s", err)
         return 3
+    except ControlledFault as err:
+        log.error("task=gold %s, no se publico nada", err)
+        return 1
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
 

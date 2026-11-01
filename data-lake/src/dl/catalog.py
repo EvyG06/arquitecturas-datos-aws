@@ -131,6 +131,7 @@ def main(argv: list[str] | None = None) -> int:
     group.add_argument("--sync", action="store_true", help="sincroniza particiones (perfil pipeline)")
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+    logging.getLogger("botocore").setLevel(logging.WARNING)
     glue = boto3.client("glue")
     if args.setup:
         setup(glue, bucket())

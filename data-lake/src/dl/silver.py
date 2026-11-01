@@ -14,7 +14,7 @@ import boto3
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from dl.config import bucket
+from dl.config import ControlledFault, bucket, fault_point
 from dl.enrich import PENDING, enrich_rows, entity_rows, key_phrase_rows
 from dl.parse import parse_feed
 from dl.s3util import ConcurrentUpdate, put_json, put_json_cas, read_json, read_json_etag
@@ -266,8 +266,6 @@ def apply_run(s3, bkt: str, state: dict, run_id: str, nlp=None) -> dict:
         "noticias_vigentes_total": len(current),
     }
     check_invariants(report)
-    stamp = processed_at.strftime("%Y%m%dT%H%M%SZ")
-    put_json(s3, bkt, f"_control/silver/run_id={run_id}/{build}__{stamp}.json", report)
 
     summary = {k: report[k] for k in ("processed_at_utc", "build_id", "nuevas", "repetidas",
                                       "actualizadas", "obsoletas", "rechazados")}
@@ -278,11 +276,16 @@ def apply_run(s3, bkt: str, state: dict, run_id: str, nlp=None) -> dict:
     else:
         entry.update(ultimo=summary, procesamientos=entry["procesamientos"] + 1)
 
-    log.info("task=silver run_id=%s build=%s nuevas=%s repetidas=%s actualizadas=%s obsoletas=%s "
+    log.info("task=silver run_id=%s aplicado build=%s nuevas=%s repetidas=%s actualizadas=%s obsoletas=%s "
              "rechazados=%s particiones=%s comprehend_textos=%s cache_hits=%s", run_id, build,
              stats["nuevas"], stats["repetidas"], stats["actualizadas"], stats["obsoletas"], len(rejected),
              report["particiones_escritas"], nlp_stats.get("textos_enviados", 0), nlp_stats.get("cache_hits", 0))
     return report
+
+
+def report_key(report: dict) -> str:
+    stamp = datetime.fromisoformat(report["processed_at_utc"]).strftime("%Y%m%dT%H%M%SZ")
+    return f"_control/silver/run_id={report['run_id']}/{report['build_id']}__{stamp}.json"
 
 
 def process_run(run_id: str, s3=None, force: bool = False, nlp=None) -> dict:
@@ -296,7 +299,10 @@ def process_run(run_id: str, s3=None, force: bool = False, nlp=None) -> dict:
         log.info("task=silver run_id=%s ya procesado, se omite", run_id)
         return {**state["processed_runs"][run_id], "skipped": True}
     report = apply_run(s3, bkt, state, run_id, nlp)
+    fault_point("silver_antes_de_publicar", f"run_id={run_id}")
     put_json_cas(s3, bkt, STATE_KEY, state, etag)
+    put_json(s3, bkt, report_key(report), report)
+    log.info("task=silver run_id=%s publicado build=%s", run_id, state["build_id"])
     return report
 
 
@@ -325,7 +331,10 @@ def rebuild(s3=None, nlp=None) -> list[dict]:
     _, etag = read_json_etag(s3, bkt, STATE_KEY)
     state = new_state(build_id())
     reports = [apply_run(s3, bkt, state, run_id, nlp) for run_id in bronze_runs(s3, bkt)]
+    fault_point("silver_antes_de_publicar", "rebuild")
     put_json_cas(s3, bkt, STATE_KEY, state, etag)
+    for report in reports:
+        put_json(s3, bkt, report_key(report), report)
     log.info("task=silver rebuild build=%s lotes=%s vigentes=%s", state["build_id"], len(reports),
              reports[-1]["noticias_vigentes_total"] if reports else 0)
     return reports
@@ -340,6 +349,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--force", action="store_true", help="reprocesa aunque el lote ya este registrado")
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+    logging.getLogger("botocore").setLevel(logging.WARNING)
 
     s3 = boto3.client("s3")
     try:
@@ -353,6 +363,9 @@ def main(argv: list[str] | None = None) -> int:
     except ConcurrentUpdate as err:
         log.error("task=silver %s", err)
         return 3
+    except ControlledFault as err:
+        log.error("task=silver %s, no se publico nada", err)
+        return 1
     for r in reports:
         print(json.dumps(r, ensure_ascii=False, indent=2))
     return 0
