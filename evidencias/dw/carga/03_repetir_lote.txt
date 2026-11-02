@@ -1,0 +1,15 @@
+batch_id=ext_02_incremental_negocio2 ya cargado en raw, no se repite (usa --recargar para reemplazarlo)
+seq  modo        filas  cargado_utc          batch_id
+  1  inicial      1112  2026-11-02 22:47:56  ext_01_inicial
+  2  incremental    12  2026-11-02 22:48:07  ext_02_incremental_negocio2
+  3  incremental    24  2026-11-02 22:48:14  ext_03_fallo_y_reintento_negocio3
+
+tabla                             filas lotes
+"raw".mongo_navigation_events       517     3
+"raw".mysql_products                 27     1
+"raw".mysql_order_items             268     3
+"raw".mysql_customers                54     1
+"raw".mongo_reviews                 167     3
+"raw".mysql_orders                  115     3
+	failed to run commands: exit status 99
+[ssm d2561bad-c8f4-4633-868d-f2d5bb5d6d91 | estado Failed | codigo 99]

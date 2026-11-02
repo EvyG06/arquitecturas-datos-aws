@@ -1,0 +1,16 @@
+batch_id=ext_04_incremental_negocio4 lote cargado en raw seq=4 filas=36
+seq  modo        filas  cargado_utc          batch_id
+  1  inicial      1112  2026-11-02 22:47:56  ext_01_inicial
+  2  incremental    12  2026-11-02 22:49:08  ext_02_incremental_negocio2
+  3  incremental    24  2026-11-02 22:48:14  ext_03_fallo_y_reintento_negocio3
+  4  incremental    36  2026-11-02 22:50:13  ext_04_incremental_negocio4
+
+tabla                             filas lotes
+"raw".mysql_orders                  124     4
+"raw".mysql_customers                54     1
+"raw".mysql_products                 27     1
+"raw".mysql_order_items             277     4
+"raw".mongo_navigation_events       526     4
+"raw".mongo_reviews                 176     4
+	
+[ssm bcd8d7ee-f060-4582-9235-7358da719489 | estado Success | codigo 0]

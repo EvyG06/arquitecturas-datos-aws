@@ -1,0 +1,23 @@
+	Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/opt/dw/src/ecommerce_dw/loading/load.py", line 138, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/opt/dw/src/ecommerce_dw/loading/load.py", line 132, in main
+    result = loader.run(args.batch_id, args.recargar)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/dw/src/ecommerce_dw/loading/load.py", line 96, in run
+    self.load_batch(entry)
+  File "/opt/dw/src/ecommerce_dw/loading/load.py", line 78, in load_batch
+    self.api.batch(self.statements(record), f"dw-carga-{record['batch_id']}")
+  File "/opt/dw/src/ecommerce_dw/loading/redshift.py", line 41, in batch
+    return self.wait(statement["Id"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/dw/src/ecommerce_dw/loading/redshift.py", line 68, in wait
+    raise RedshiftError(self._error_message(description))
+ecommerce_dw.loading.redshift.RedshiftError: FAILED en 03bfa8e0-3642-497f-ac96-0230e1c5b78c: Query #8 failed with ERROR: division by zero
+  sentencia que fallo: select 1 / 0 as fallo_controlado_carga_a_mitad
+  error: ERROR: division by zero
+failed to run commands: exit status 1
+[ssm 89fccd35-2479-4c6a-98a0-a7a01ada5a69 | estado Failed | codigo 1]

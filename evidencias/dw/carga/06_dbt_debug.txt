@@ -1,0 +1,49 @@
+[0m22:50:26  Running with dbt=1.9.4
+[0m22:50:26  Installing dbt-labs/dbt_utils
+[0m22:50:26  Installed from version 1.3.0
+[0m22:50:26  Updated version available: 1.4.1
+[0m22:50:26  
+[0m22:50:26  Updates available for packages: ['dbt-labs/dbt_utils']                 
+Update your versions in packages.yml, then run dbt deps
+[0m22:50:29  Running with dbt=1.9.4
+[0m22:50:29  dbt version: 1.9.4
+[0m22:50:29  python version: 3.11.15
+[0m22:50:29  python path: /home/airflow/dbt-venv/bin/python3.11
+[0m22:50:29  os info: Linux-6.18.56-125.164.amzn2023.x86_64-x86_64-with-glibc2.36
+[0m22:50:29  Using profiles dir at /opt/dbt-work/project
+[0m22:50:29  Using profiles.yml file at /opt/dbt-work/project/profiles.yml
+[0m22:50:29  Using dbt_project.yml file at /opt/dbt-work/project/dbt_project.yml
+[0m22:50:29  adapter type: redshift
+[0m22:50:29  adapter version: 1.9.5
+[0m22:50:29  Skipping steps before connection verification
+[0m22:50:29  Connection:
+[0m22:50:29    host: arq-datos-dw.726168540074.us-east-2.redshift-serverless.amazonaws.com
+[0m22:50:29    user: None
+[0m22:50:29    port: 5439
+[0m22:50:29    database: ecommerce_dw
+[0m22:50:29    method: iam_role
+[0m22:50:29    cluster_id: None
+[0m22:50:29    iam_profile: pipeline
+[0m22:50:29    schema: intermediate
+[0m22:50:29    sslmode: verify-full
+[0m22:50:29    region: us-east-2
+[0m22:50:29    sslmode: verify-full
+[0m22:50:29    region: us-east-2
+[0m22:50:29    autocreate: False
+[0m22:50:29    db_groups: []
+[0m22:50:29    ra3_node: True
+[0m22:50:29    connect_timeout: 30
+[0m22:50:29    role: None
+[0m22:50:29    retries: 2
+[0m22:50:29    retry_all: False
+[0m22:50:29    autocommit: True
+[0m22:50:29    access_key_id: None
+[0m22:50:29    is_serverless: None
+[0m22:50:29    serverless_work_group: None
+[0m22:50:29    serverless_acct_id: None
+[0m22:50:29  Registered adapter: redshift=1.9.5
+[0m22:50:30    Connection test: [[32mOK connection ok[0m]
+
+[0m22:50:30  [32mAll checks passed![0m
+	
+[ssm faf1a487-8eab-48c0-9fac-82ef756bb940 | estado Success | codigo 0]

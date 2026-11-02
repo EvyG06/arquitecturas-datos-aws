@@ -1,0 +1,17 @@
+batch_id=ext_01_inicial lote cargado en raw seq=1 filas=1112
+batch_id=ext_02_incremental_negocio2 lote cargado en raw seq=2 filas=12
+batch_id=ext_03_fallo_y_reintento_negocio3 lote cargado en raw seq=3 filas=24
+seq  modo        filas  cargado_utc          batch_id
+  1  inicial      1112  2026-11-02 22:47:56  ext_01_inicial
+  2  incremental    12  2026-11-02 22:48:07  ext_02_incremental_negocio2
+  3  incremental    24  2026-11-02 22:48:14  ext_03_fallo_y_reintento_negocio3
+
+tabla                             filas lotes
+"raw".mongo_navigation_events       517     3
+"raw".mysql_products                 27     1
+"raw".mysql_order_items             268     3
+"raw".mysql_customers                54     1
+"raw".mongo_reviews                 167     3
+"raw".mysql_orders                  115     3
+	
+[ssm ad4d9ef4-185e-49ab-a811-ba81a58f40b7 | estado Success | codigo 0]
