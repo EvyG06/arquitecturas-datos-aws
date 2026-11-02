@@ -5,7 +5,7 @@ where candidate.{{ key_column }} not in (
     select existing.{{ key_column }} from {{ this }} as existing
 )
 or candidate.{{ business_date_column }} >= (
-    select max(dates.date) - {{ var('incremental_lookback_days') }}
+    select {{ dbt.dateadd('day', -var('incremental_lookback_days'), 'max(dates.date)') }}
     from {{ this }} as existing
     inner join {{ ref('dim_date') }} as dates on dates.date_sk = existing.date_sk
 )
@@ -16,7 +16,7 @@ or exists (
     where existing.{{ key_column }} = candidate.{{ key_column }}
     and (
         {% for column in tracked_columns %}
-        existing.{{ column }} is distinct from candidate.{{ column }}{{ "" if loop.last else " or" }}
+        {{ is_distinct("existing." ~ column, "candidate." ~ column) }}{{ "" if loop.last else " or" }}
         {% endfor %}
     )
 )

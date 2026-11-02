@@ -12,6 +12,8 @@ models:
     intermediate:
       +schema: intermediate
       +materialized: view
+      # Redshift: vistas de enlace tardio, asi reconstruir una tabla no obliga a borrar las vistas que la leen.
+      +bind: false
     quarantine:
       +schema: quarantine
       +materialized: table

@@ -23,8 +23,8 @@ select
     cast(extract(quarter from date) as integer) as quarter,
     cast(extract(month from date) as integer) as month,
     cast(extract(week from date) as integer) as week,
-    cast(extract(isodow from date) as integer) as day_of_week_number,
-    case extract(isodow from date)
+    cast({{ iso_day_of_week('date') }} as integer) as day_of_week_number,
+    case cast({{ iso_day_of_week('date') }} as integer)
         when 1 then 'lunes'
         when 2 then 'martes'
         when 3 then 'miércoles'
@@ -34,7 +34,7 @@ select
         when 7 then 'domingo'
     end as day_of_week,
     cast(extract(day from date) as integer) as day_of_month,
-    extract(isodow from date) in (6, 7) as is_weekend,
+    cast({{ iso_day_of_week('date') }} as integer) in (6, 7) as is_weekend,
     holidays.holiday_name is not null as is_holiday,
     holidays.holiday_name as holiday_name
 from date_spine

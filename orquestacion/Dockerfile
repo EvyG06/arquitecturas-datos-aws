@@ -6,7 +6,8 @@ FROM apache/airflow:2.11.2-python3.11
 USER root
 RUN mkdir -p /opt/certs \
     && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem -o /opt/certs/rds-global-bundle.pem \
-    && chmod 644 /opt/certs/rds-global-bundle.pem
+    && chmod 644 /opt/certs/rds-global-bundle.pem \
+    && mkdir -p /opt/dbt-work && chown airflow:0 /opt/dbt-work
 USER airflow
 
 COPY data-lake/requirements.txt /tmp/dl-requirements.txt
@@ -20,3 +21,9 @@ RUN python -m venv /home/airflow/dw-venv \
     && /home/airflow/dw-venv/bin/pip install --no-cache-dir -r /tmp/dw-requirements.txt \
     && /home/airflow/dw-venv/bin/pip check \
     && /home/airflow/dw-venv/bin/pip freeze > /home/airflow/dw-venv/versiones.txt
+
+# dbt en su propio venv, igual que en el DE-DW, con el adaptador de Redshift en lugar del de DuckDB.
+RUN python -m venv /home/airflow/dbt-venv \
+    && /home/airflow/dbt-venv/bin/pip install --no-cache-dir "dbt-core==1.9.4" "dbt-redshift==1.9.5" \
+    && /home/airflow/dbt-venv/bin/pip check \
+    && /home/airflow/dbt-venv/bin/pip freeze > /home/airflow/dbt-venv/versiones.txt

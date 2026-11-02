@@ -21,4 +21,4 @@ select
     fact_totals.subtotal as fact_subtotal
 from source_totals
 full outer join fact_totals using (date)
-where source_totals.subtotal is distinct from fact_totals.subtotal
+where {{ is_distinct('source_totals.subtotal', 'fact_totals.subtotal') }}

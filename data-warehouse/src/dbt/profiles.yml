@@ -1,8 +1,28 @@
 ecommerce_dw:
-  target: local
+  target: aws
   outputs:
-    local:
+    # DuckDB con el mismo esquema raw de AWS (solo insercion, con _batch_id y _cdc_ts). Sirve para probar la
+    # logica del proyecto sin gastar computo de Redshift. La version local original vive en el repo DE-DW.
+    duckdb_prueba:
       type: duckdb
-      path: /opt/warehouse/warehouse.duckdb
+      path: "{{ env_var('DW_DUCKDB_PATH', 'prueba.duckdb') }}"
       schema: intermediate
       threads: 1
+      settings:
+        TimeZone: UTC
+    # Redshift Serverless en AWS. Sin usuario ni contrasena: dbt pide credenciales temporales con el rol del
+    # perfil (GetCredentials) y Redshift lo ve como IAMR:arq-datos-pipeline. El host sale de SSM en dbt_aws.sh.
+    aws:
+      type: redshift
+      method: iam_role
+      host: "{{ env_var('DW_REDSHIFT_HOST', 'sin-configurar.us-east-2.redshift-serverless.amazonaws.com') }}"
+      port: 5439
+      dbname: ecommerce_dw
+      schema: intermediate
+      iam_profile: "{{ env_var('AWS_PROFILE', 'pipeline') }}"
+      region: "{{ env_var('AWS_REGION', 'us-east-2') }}"
+      sslmode: verify-full
+      ra3_node: true
+      threads: 4
+      retries: 2
+      connect_timeout: 30

@@ -12,7 +12,7 @@ with events as (
         customer_id,
         product_id,
         sales_channel,
-        timezone('America/Bogota', occurred_at) as occurred_local_at
+        {{ to_business_time('occurred_at') }} as occurred_local_at
     from {{ ref('int_mongodb__navigation_events__valid') }}
 ),
 customers_versioned as (

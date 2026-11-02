@@ -6,6 +6,8 @@ select
     nullif(trim(description), '') as description,
     cast(is_active as boolean) as is_active,
     cast(updated_at as timestamp) as updated_at,
+    _batch_id,
+    _cdc_ts,
     _loaded_at,
     _source
-from {{ source('mysql_raw', 'mysql_products') }}
+from ({{ latest_version(source('mysql_raw', 'mysql_products'), 'product_id') }}) as latest

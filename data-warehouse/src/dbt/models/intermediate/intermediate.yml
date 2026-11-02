@@ -2,32 +2,32 @@ version: 2
 
 models:
   - name: stg_mysql__customers
-    description: Clientes tipados y renombrados 1:1 desde raw, sin filtrar filas.
+    description: Clientes tipados desde raw con la ultima version de cada llave (raw es de solo insercion por lote).
     columns:
       - name: customer_id
         tests: [unique, not_null]
   - name: stg_mysql__products
-    description: Productos tipados y renombrados 1:1 desde raw, sin filtrar filas.
+    description: Productos tipados desde raw con la ultima version de cada llave (raw es de solo insercion por lote).
     columns:
       - name: product_id
         tests: [unique, not_null]
   - name: stg_mysql__orders
-    description: Pedidos tipados y renombrados 1:1 desde raw, sin filtrar filas.
+    description: Pedidos tipados desde raw con la ultima version de cada llave (raw es de solo insercion por lote).
     columns:
       - name: order_id
         tests: [unique, not_null]
   - name: stg_mysql__order_items
-    description: Líneas de pedido tipados y renombrados 1:1 desde raw, sin filtrar filas.
+    description: Líneas de pedido tipados desde raw con la ultima version de cada llave (raw es de solo insercion por lote).
     columns:
       - name: order_item_id
         tests: [unique, not_null]
   - name: stg_mongodb__reviews
-    description: Reseñas tipados y renombrados 1:1 desde raw, sin filtrar filas.
+    description: Reseñas tipados desde raw con la ultima version de cada llave (raw es de solo insercion por lote).
     columns:
       - name: review_id
         tests: [unique, not_null]
   - name: stg_mongodb__navigation_events
-    description: Eventos de navegación tipados y renombrados 1:1 desde raw, sin filtrar filas.
+    description: Eventos de navegación tipados desde raw con la ultima version de cada llave (raw es de solo insercion por lote).
     columns:
       - name: event_id
         tests: [unique, not_null]

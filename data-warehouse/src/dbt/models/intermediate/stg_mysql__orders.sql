@@ -6,6 +6,8 @@ select
     nullif(trim(sales_channel), '') as sales_channel,
     nullif(trim(payment_method), '') as payment_method,
     cast(total as decimal(14, 2)) as total,
+    _batch_id,
+    _cdc_ts,
     _loaded_at,
     _source
-from {{ source('mysql_raw', 'mysql_orders') }}
+from ({{ latest_version(source('mysql_raw', 'mysql_orders'), 'order_id') }}) as latest

@@ -12,7 +12,7 @@ with reviews as (
         product_id,
         rating,
         is_verified_purchase,
-        timezone('America/Bogota', reviewed_at) as reviewed_local_at
+        {{ to_business_time('reviewed_at') }} as reviewed_local_at
     from {{ ref('int_mongodb__reviews__valid') }}
 ),
 customers_versioned as (

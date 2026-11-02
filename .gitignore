@@ -13,3 +13,5 @@ data-warehouse/src/dbt/logs/
 orquestacion/.env
 orquestacion/aws/
 .logs/
+*.duckdb
+*.duckdb.wal

@@ -34,6 +34,7 @@ x-airflow-common: &airflow-common
     - ../data-warehouse:/opt/dw:ro
     - ./aws:/opt/airflow/aws:ro
     - airflow_logs:/opt/airflow/logs
+    - dbt_work:/opt/dbt-work
   depends_on: &airflow-depends
     postgres:
       condition: service_healthy
@@ -107,3 +108,4 @@ services:
 volumes:
   postgres_data:
   airflow_logs:
+  dbt_work:
