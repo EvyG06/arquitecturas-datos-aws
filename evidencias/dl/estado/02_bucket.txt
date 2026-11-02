@@ -1,5 +1,5 @@
 == 02. Bucket unico del data lake y sus controles ==
-2026-11-02 13:32:58 -05  (18:32:58 UTC)  cuenta 726168540074  region us-east-2
+2026-11-02 13:38:47 -05  (18:38:47 UTC)  cuenta 726168540074  region us-east-2
 
 Bucket eve-dl-726168540074-us-east-2
   cifrado por defecto    AES256

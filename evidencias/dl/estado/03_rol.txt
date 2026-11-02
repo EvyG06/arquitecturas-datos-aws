@@ -1,5 +1,5 @@
 == 03. Rol de pipeline con minimo privilegio ==
-2026-11-02 13:33:25 -05  (18:33:25 UTC)  cuenta 726168540074  region us-east-2
+2026-11-02 13:38:54 -05  (18:38:54 UTC)  cuenta 726168540074  region us-east-2
 
 Rol arq-datos-pipeline, identidades que pueden asumirlo
 ---------------------------------------------------------------------------
@@ -20,7 +20,3 @@ Politicas inline del rol  dl-access
 |  AthenaWorkgroupDl    |  athena:StartQueryExecution, athena:GetQueryExecution, athena:GetQueryResults, athena:StopQueryExecution, athena:GetWorkGroup                                                                                                             |
 +-----------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 Prueba 1, el pipeline intenta borrar un original de Bronze (debe fallar)
-delete failed: s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_economia/ingestion_date=2026-10-31/run_id=manual__primera/feed.xml An error occurred (AccessDenied) when calling the DeleteObject operation: User: arn:aws:sts::726168540074:assumed-role/arq-datos-pipeline/eve-local is not authorized to perform: s3:DeleteObject on resource: "arn:aws:s3:::eve-dl-726168540074-us-east-2/bronze/source=eltiempo_economia/ingestion_date=2026-10-31/run_id=manual__primera/feed.xml" because no identity-based policy allows the s3:DeleteObject action
-
-Prueba 2, el pipeline intenta listar todos los buckets de la cuenta (debe fallar)
-aws: [ERROR]: An error occurred (AccessDenied) when calling the ListBuckets operation: User: arn:aws:sts::726168540074:assumed-role/arq-datos-pipeline/eve-local is not authorized to perform: s3:ListAllMyBuckets because no identity-based policy allows the s3:ListAllMyBuckets action
