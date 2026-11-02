@@ -107,13 +107,7 @@ paso "9. Registro y manifiesto COPY del lote incremental"
 evidencia 07_registro_lote.txt sh -c "aws s3 cp 's3://$DW_BUCKET/_control/extraction/batch_id=$B2/batch.json' - && aws s3 cp 's3://$DW_BUCKET/_control/copy/batch_id=$B2/mysql_orders.manifest' -"
 
 paso "10. S3 rechaza sobrescribir el archivo de otro lote"
-KEY="raw/mysql/orders/batch_id=$B1/part-00000.parquet"
-SALIDA=$(aws s3api put-object --bucket "$DW_BUCKET" --key "$KEY" --body /dev/null --if-none-match '*' 2>&1 || true)
-case "$SALIDA" in
-  *PreconditionFailed*) MSG="OK: put-object con If-None-Match sobre $KEY fue rechazado con 412 PreconditionFailed" ;;
-  *) MSG="Resultado inesperado: $SALIDA" ;;
-esac
-echo "$MSG" | tee "$EV/08_sin_sobrescritura.txt"
+./infra/dw/evidencia_sin_sobrescritura.sh
 
 paso "11. Commit de las evidencias"
 git add evidencias

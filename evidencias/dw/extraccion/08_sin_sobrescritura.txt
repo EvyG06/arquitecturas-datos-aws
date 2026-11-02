@@ -1,2 +1,7 @@
-Resultado inesperado: 
-aws: [ERROR]: An error occurred (ParamValidation): Error parsing parameter '--body': Blob values must be a path to a file.
+# put-object con If-None-Match: * de un archivo vacio sobre un Parquet existente
+objeto:  s3://eve-dw-726168540074-us-east-2/raw/mysql/orders/batch_id=ext_01_inicial/part-00000.parquet
+antes:   "a8b0f2c5965625d0a46195f4b293ad5a"	6009
+intento: 
+aws: [ERROR]: An error occurred (PreconditionFailed) when calling the PutObject operation: At least one of the pre-conditions you specified did not hold
+despues: "a8b0f2c5965625d0a46195f4b293ad5a"	6009
+OK: S3 respondio 412 PreconditionFailed y el objeto no cambio
