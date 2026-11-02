@@ -1,10 +1,12 @@
 {# Diferencias de dialecto entre DuckDB y Redshift. Cada macro tiene una version por adaptador (adapter.dispatch):
    el proyecto corre en Redshift en AWS y en DuckDB para probar la logica sin gastar computo. #}
 
-{# Hora local de negocio de un instante guardado en UTC. #}
+{# Hora local de negocio de un instante guardado en UTC. En Redshift, CONVERT_TIMEZONE esta documentada para
+   TIMESTAMP: se pasa el instante a TIMESTAMP en UTC (la zona de la sesion de Redshift) y se usa la forma de
+   tres argumentos, que no depende de como el motor resuelva un TIMESTAMPTZ. #}
 {% macro to_business_time(column) %}{{ return(adapter.dispatch('to_business_time')(column)) }}{% endmacro %}
 {% macro default__to_business_time(column) %}timezone('{{ var("business_timezone") }}', {{ column }}){% endmacro %}
-{% macro redshift__to_business_time(column) %}convert_timezone('{{ var("business_timezone") }}', {{ column }}){% endmacro %}
+{% macro redshift__to_business_time(column) %}convert_timezone('UTC', '{{ var("business_timezone") }}', cast({{ column }} as timestamp)){% endmacro %}
 
 {# Dia de la semana ISO: lunes 1 a domingo 7. Redshift no tiene isodow: su dow va de domingo 0 a sabado 6. #}
 {% macro iso_day_of_week(column) %}{{ return(adapter.dispatch('iso_day_of_week')(column)) }}{% endmacro %}

@@ -16,7 +16,17 @@ exec > >(tee -a "$LOG") 2>&1
 paso() { printf '\n==== %s | %s\n' "$(date +%H:%M:%S)" "$*"; }
 remoto() { ./infra/ec2/remoto.sh "$@"; }
 dw() { remoto "arquitecturas-datos-aws/orquestacion/dw.sh $*"; }
-dbt() { remoto "arquitecturas-datos-aws/orquestacion/dbt.sh $*"; }
+# La salida por SSM se corta a 24.000 caracteres: se muestra solo el final de dbt y despues el resumen de
+# run_results.json, que trae los conteos y el mensaje completo de cada error.
+dbt() { remoto "set -o pipefail; arquitecturas-datos-aws/orquestacion/dbt.sh $* 2>&1 | tail -n 40"; }
+resumen() { dw transformations.resumen_dbt; }
+# dbt_build <evidencia>: corre dbt build, guarda el final y el resumen, y corta el script si algo fallo.
+dbt_build() {
+  local rc=0 rc2=0
+  evidencia "$1" dbt build || rc=$?
+  set +e; resumen 2>&1 | tee -a "$EV/$1"; rc2=${PIPESTATUS[0]}; set -e
+  exige "0" "$rc"; exige "0" "$rc2"
+}
 evidencia() {
   local file="$EV/$1"; shift
   set +e; "$@" 2>&1 | tee "$file"; local rc=${PIPESTATUS[0]}; set -e
@@ -56,7 +66,7 @@ paso "1. Encender EC2 y fuentes, y codigo nuevo en la EC2"
 remoto 'set -o pipefail; cd arquitecturas-datos-aws && git pull --ff-only && ./orquestacion/setup_ec2.sh 2>&1 | tail -3'
 
 paso "2. Carga inicial: dbt build (seeds, snapshots, modelos y pruebas) sobre los lotes cargados"
-rc=0; evidencia 01_dbt_build_inicial.txt dbt build || rc=$?; exige "0" "$rc"
+dbt_build 01_dbt_build_inicial.txt
 
 paso "3. Datos en los modelos, rechazos trazables y conciliacion con MySQL"
 rc=0; evidencia 02_huella_inicial.txt dw loading.consultas huella capas || rc=$?; exige "0" "$rc"
@@ -65,7 +75,7 @@ rc=0; evidencia 04_conciliacion.txt dw loading.consultas conciliacion || rc=$?; 
 
 paso "4. Repetir un lote exitoso: recargar ext_04 y dbt build, sin hechos ni versiones nuevas"
 rc=0; dw loading.load --batch-id ext_04_incremental_negocio4 --recargar || rc=$?; exige "0" "$rc"
-rc=0; evidencia 05a_dbt_build_repeticion.txt dbt build || rc=$?; exige "0" "$rc"
+dbt_build 05a_dbt_build_repeticion.txt
 rc=0; evidencia 05b_huella_repeticion.txt dw loading.consultas huella || rc=$?; exige "0" "$rc"
 if diff <(huella "$EV/02_huella_inicial.txt") <(huella "$EV/05b_huella_repeticion.txt"); then
   echo "OK: la huella de hechos y dimensiones es identica antes y despues de repetir el lote" | tee -a "$EV/05b_huella_repeticion.txt"
@@ -75,12 +85,12 @@ fi
 
 paso "5. Nuevo lote incremental: lote de negocio 5"
 nuevo_lote ext_05_incremental_negocio5 sources.append_batch --batch-id 5
-rc=0; evidencia 06a_dbt_build_incremental.txt dbt build || rc=$?; exige "0" "$rc"
+dbt_build 06a_dbt_build_incremental.txt
 rc=0; evidencia 06b_huella_incremental.txt dw loading.consultas huella capas || rc=$?; exige "0" "$rc"
 
 paso "6. Cambio en un atributo historizado: cliente 1 a Medellin y producto 1 a Hogar desde 2025-07-01"
 nuevo_lote ext_06_scd2_cliente1_producto1 sources.simulate_changes
-rc=0; evidencia 07a_dbt_build_scd2.txt dbt build || rc=$?; exige "0" "$rc"
+dbt_build 07a_dbt_build_scd2.txt
 rc=0; evidencia 07b_scd2.txt dw loading.consultas scd2 huella || rc=$?; exige "0" "$rc"
 rc=0; evidencia 08_conciliacion_final.txt dw loading.consultas conciliacion || rc=$?; exige "0" "$rc"
 evidencia 09_cargas.txt dw loading.load --estado
