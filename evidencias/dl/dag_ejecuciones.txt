@@ -1,0 +1,5 @@
+Ejecuciones del DAG registradas por la etapa 9: 1
+
+registrado_utc       dag_run_id                            modo    resultado  fallidas  fuentes                           
+-------------------  ------------------------------------  ------  ---------  --------  ----------------------------------
+2026-11-02 19:19:25  scheduled__2026-11-02T18:30:00+00:00  normal  completa   -         economia=ok, mundo=ok, politica=ok

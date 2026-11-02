@@ -176,6 +176,21 @@ def cmd_particiones(s3, b, args) -> None:
     print(table(rows, width=48))
 
 
+def cmd_pipeline(s3, b, args) -> None:
+    rows = []
+    for page in s3.get_paginator("list_objects_v2").paginate(Bucket=b, Prefix="_control/pipeline/"):
+        for obj in page.get("Contents", []):
+            r = read_json(s3, b, obj["Key"])
+            fuentes = r.get("fuentes") or {}
+            rows.append({"registrado_utc": str(r["registrado_utc"])[:19], "dag_run_id": r["dag_run_id"],
+                         "modo": r["modo"], "resultado": r["resultado"],
+                         "fallidas": ", ".join(r["tareas_fallidas"]) or "-",
+                         "fuentes": ", ".join(f"{k.replace('eltiempo_', '')}={v['status']}"
+                                              for k, v in sorted(fuentes.items())) or "-"})
+    print(f"Ejecuciones del DAG registradas por la etapa 9: {len(rows)}\n")
+    print(table(sorted(rows, key=lambda r: r["registrado_utc"]), width=60))
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Evidencias del data lake (solo lectura)")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -188,6 +203,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("cuarentena").add_argument("run_id")
     sub.add_parser("versiones")
     sub.add_parser("particiones")
+    sub.add_parser("pipeline")
     args = p.parse_args(argv)
     globals()[f"cmd_{args.cmd}"](boto3.client("s3"), bucket(), args)
     return 0
