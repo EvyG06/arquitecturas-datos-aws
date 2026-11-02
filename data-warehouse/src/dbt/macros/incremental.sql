@@ -1,26 +1,22 @@
-{# Filtro de cargas incrementales para la fila candidata (alias candidate). Carga las llaves nuevas, las filas cuya fecha de negocio cae en la ventana de reproceso (desde incremental_lookback_days antes de la fecha máxima ya cargada) y las filas cuyas llaves de dimensión resueltas cambiaron (tracked_columns), por ejemplo cuando una versión SCD2 nueva reemplaza a la anterior. #}
+{# Filtro de cargas incrementales para la fila candidata (alias candidate). Carga las llaves nuevas, las filas cuya
+   fecha de negocio cae en la ventana de reproceso (desde incremental_lookback_days antes de la fecha maxima ya
+   cargada) y las filas cuyas llaves de dimension resueltas cambiaron (tracked_columns), por ejemplo cuando una
+   version SCD2 nueva reemplaza a la anterior.
+   Se escribe con LEFT JOIN contra la tabla existente en lugar de NOT IN y EXISTS correlacionado: es la misma
+   seleccion, y Redshift no soporta varios patrones de subconsultas correlacionadas. #}
 {% macro incremental_candidate_filter(key_column, business_date_column, tracked_columns=[]) %}
 {% if is_incremental() %}
-where candidate.{{ key_column }} not in (
-    select existing.{{ key_column }} from {{ this }} as existing
-)
+left join {{ this }} as existing
+    on existing.{{ key_column }} = candidate.{{ key_column }}
+where existing.{{ key_column }} is null
 or candidate.{{ business_date_column }} >= (
     select {{ dbt.dateadd('day', -var('incremental_lookback_days'), 'max(dates.date)') }}
-    from {{ this }} as existing
-    inner join {{ ref('dim_date') }} as dates on dates.date_sk = existing.date_sk
+    from {{ this }} as loaded
+    inner join {{ ref('dim_date') }} as dates on dates.date_sk = loaded.date_sk
 )
-{% if tracked_columns %}
-or exists (
-    select 1
-    from {{ this }} as existing
-    where existing.{{ key_column }} = candidate.{{ key_column }}
-    and (
-        {% for column in tracked_columns %}
-        {{ is_distinct("existing." ~ column, "candidate." ~ column) }}{{ "" if loop.last else " or" }}
-        {% endfor %}
-    )
-)
-{% endif %}
+{% for column in tracked_columns %}
+or {{ is_distinct("existing." ~ column, "candidate." ~ column) }}
+{% endfor %}
 {% endif %}
 {% endmacro %}
 

@@ -1,3 +1,8 @@
+{# Tabla y no vista: en Redshift, si un hecho une estas filas por llave, el planificador vuelve correlacionado
+   el NOT IN de las reglas, y una subconsulta correlacionada sobre staging (que tiene row_number) no esta
+   soportada. Materializado, el NOT IN se resuelve una vez y los hechos leen una tabla. #}
+{{ config(materialized='table') }}
+
 select
     *,
     case
