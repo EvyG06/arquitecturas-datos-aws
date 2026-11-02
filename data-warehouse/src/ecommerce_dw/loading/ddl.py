@@ -3,6 +3,9 @@
 Asi el orden y el numero de columnas de la tabla temporal coinciden siempre con el archivo, que es lo que
 COPY exige para Parquet. Las tablas conservan los nombres de la version local (raw.mysql_*, raw.mongo_*)
 para no cambiar los sources de dbt. La columna _source dice la fuente real (documentdb.*).
+
+RAW es palabra reservada en Redshift (una codificacion de compresion), asi que el esquema va siempre entre
+comillas dobles. En dbt lo resuelve quoting: schema: true en sources.yml.
 """
 from __future__ import annotations
 
@@ -10,7 +13,7 @@ import pyarrow as pa
 
 from ecommerce_dw.extraction.entities import ENTITIES, META, Entity
 
-SCHEMA = "raw"
+SCHEMA = '"raw"'
 CONTROL_TABLE = f"{SCHEMA}._cargas"
 _PREFIX = {"mysql": "mysql", "documentdb": "mongo"}
 

@@ -96,8 +96,11 @@ done
 
 # 5. Tope de costo: si el dia supera el limite de RPU-hora, Redshift desactiva el workgroup hasta el dia siguiente.
 WG_ARN=$(aws redshift-serverless get-workgroup --workgroup-name "$P" --query workgroup.workgroupArn --output text)
-if [ "$(aws redshift-serverless list-usage-limits --resource-arn "$WG_ARN" --usage-type serverless-compute \
-        --query 'length(usageLimits)' --output text)" = 0 ]; then
+# list-usage-limits no acepta --resource-arn y --usage-type juntos: se filtra el tipo en la consulta. Va fuera
+# del if para que un error de la API corte el script (set -e no corta dentro de una condicion).
+LIMITES=$(aws redshift-serverless list-usage-limits --resource-arn "$WG_ARN" \
+  --query 'length(usageLimits[?usageType==`serverless-compute`])' --output text)
+if [ "$LIMITES" = 0 ]; then
   aws redshift-serverless create-usage-limit --resource-arn "$WG_ARN" --usage-type serverless-compute \
     --amount "$LIMITE_RPU_HORAS_DIA" --period daily --breach-action deactivate >/dev/null
   echo "Limite de uso creado: $LIMITE_RPU_HORAS_DIA RPU-hora por dia, al superarlo se desactiva"

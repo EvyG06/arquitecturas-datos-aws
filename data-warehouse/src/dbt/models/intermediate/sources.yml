@@ -3,6 +3,8 @@ version: 2
 sources:
   - name: mysql_raw
     schema: raw
+    quoting:
+      schema: true  # RAW es palabra reservada en Redshift
     tables:
       - name: mysql_customers
       - name: mysql_products
@@ -10,6 +12,8 @@ sources:
       - name: mysql_order_items
   - name: mongodb_raw
     schema: raw
+    quoting:
+      schema: true
     tables:
       - name: mongo_reviews
       - name: mongo_navigation_events

@@ -68,7 +68,7 @@ def test_ddl_mismo_orden_que_el_parquet_y_tipos():
     assert dict(ddl.columns(ENTITIES[4]))["document_json"] == "varchar(65535)"
     assert ddl.create_raw_table(orders).rstrip().endswith("_loaded_at timestamp not null\n)")
     assert "_loaded_at" not in ddl.create_temp_table(orders)
-    assert ddl.table(ENTITIES[5]) == "raw.mongo_navigation_events"  # mismo nombre que el source de dbt
+    assert ddl.table(ENTITIES[5]) == '"raw".mongo_navigation_events'  # mismo nombre que el source de dbt
 
 
 def test_sentencias_de_un_lote(s3):
@@ -78,11 +78,11 @@ def test_sentencias_de_un_lote(s3):
     assert copy == [f"copy carga_mysql_orders from 's3://{BUCKET}/_control/copy/batch_id=ext_01/mysql_orders.manifest' "
                     f"iam_role '{ROLE}' format as parquet manifest"]
     assert "select 1 / (case when (select count(*) from carga_mysql_orders) = 106 then 1 else 0 end) as conteo_ok" in sqls
-    assert "delete from raw.mysql_orders where _batch_id = 'ext_01'" in sqls
+    assert "delete from \"raw\".mysql_orders where _batch_id = 'ext_01'" in sqls
     # las entidades sin filas no hacen COPY, solo limpian lo que hubiera de ese lote
     assert not any(s.startswith("copy carga_mysql_customers") for s in sqls)
-    assert "delete from raw.mysql_customers where _batch_id = 'ext_01'" in sqls
-    assert sqls[-1].startswith("insert into raw._cargas values ('ext_01', 1, 'inicial', 'mysql.customers', 0")
+    assert "delete from \"raw\".mysql_customers where _batch_id = 'ext_01'" in sqls
+    assert sqls[-1].startswith("insert into \"raw\"._cargas values ('ext_01', 1, 'inicial', 'mysql.customers', 0")
     full = loader.statements(record("x", 1, {e.id: 1 for e in ENTITIES}))
     assert len(full) == 32 <= 40  # limite de BatchExecuteStatement
 
