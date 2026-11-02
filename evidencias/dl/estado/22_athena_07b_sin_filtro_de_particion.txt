@@ -1,0 +1,16 @@
+== 22. Athena, 07b_sin_filtro_de_particion.sql ==
+2026-11-02 13:37:48 -05  (18:37:48 UTC)  cuenta 726168540074  region us-east-2
+
+    -- Misma consulta que 07a, SIN filtro de particion. Athena lee todas las fechas.
+    SELECT seccion, count(*) AS noticias, max(length(description)) AS desc_mas_larga
+    FROM silver_news
+    GROUP BY seccion
+    ORDER BY seccion
+
+== 07b_sin_filtro_de_particion.sql
+seccion   noticias  desc_mas_larga
+--------  --------  --------------
+Economía  32        150           
+Mundo     28        150           
+Política  27        150           
+[3 filas | 11,105 bytes escaneados | 623 ms | cc7f4f02-5d1a-4437-b919-b3804972cddc]

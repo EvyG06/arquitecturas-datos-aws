@@ -1,0 +1,5 @@
+== 09. Cuarentena de registros invalidos ==
+2026-11-02 13:35:05 -05  (18:35:05 UTC)  cuenta 726168540074  region us-east-2
+
+Registros rechazados por Silver, un archivo por lote
+2026-11-02 13:00:08       2985 quarantine/silver/run_id=prueba__controlada_20261101T163714Z/rechazos.jsonl

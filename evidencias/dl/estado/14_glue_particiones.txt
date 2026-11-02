@@ -1,0 +1,17 @@
+== 14. Glue Data Catalog, particiones ==
+2026-11-02 13:36:05 -05  (18:36:05 UTC)  cuenta 726168540074  region us-east-2
+
+tabla                    en_glue                                         faltan_en_glue  ubicacion_desactualizada
+-----------------------  ----------------------------------------------  --------------  ------------------------
+silver_news              2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               -                       
+silver_news_entities     2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               -                       
+silver_news_key_phrases  2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               -                       
+gold_news_daily          2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               -                       
+gold_entity_daily        2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               -                       
+gold_key_phrase_daily    2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               -                       
+
+Ubicacion registrada de cada particion de silver_news
+2026-10-30	s3://eve-dl-726168540074-us-east-2/silver/news/pub_date=2026-10-30/v=b20261102T175946Z-df39bd-manual__primera/
+2026-10-31	s3://eve-dl-726168540074-us-east-2/silver/news/pub_date=2026-10-31/v=b20261102T175946Z-df39bd-manual__inc_20261101T163714Z/
+2026-11-01	s3://eve-dl-726168540074-us-east-2/silver/news/pub_date=2026-11-01/v=b20261102T175946Z-df39bd-manual__fallo_20261101T163714Z/
+2026-11-02	s3://eve-dl-726168540074-us-east-2/silver/news/pub_date=2026-11-02/v=b20261102T175946Z-df39bd-manual__inc_20261102T183107Z/

@@ -1,0 +1,20 @@
+== 15. Athena, 01_noticias_por_fecha_y_seccion.sql ==
+2026-11-02 13:36:20 -05  (18:36:20 UTC)  cuenta 726168540074  region us-east-2
+
+    -- Noticias vigentes de una fecha y una seccion. Cambia la fecha y la seccion segun lo que quieras ver.
+    SELECT pub_date, seccion, news_id, published_at_utc, title, link
+    FROM silver_news
+    WHERE pub_date = DATE '2026-10-31'
+      AND seccion = 'Política'
+    ORDER BY published_at_utc DESC
+
+== 01_noticias_por_fecha_y_seccion.sql
+pub_date    seccion   news_id  published_at_utc         title                                                                                                                                   link                                                                                                                                                                                                 
+----------  --------  -------  -----------------------  --------------------------------------------------------------------------------------------------------------------------------------  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2026-10-31  Política  3597786  2026-11-01 03:42:02.000  Presidente Abelardo De La Espriella confirma traslado masivo de 33 presos desde San Andrés hacia Bogotá: dio detalles del operativo     https://www.eltiempo.com/politica/abelardo-de-la-espriella/presidente-abelardo-de-la-espriella-confirma-traslado-masivo-de-33-presos-desde-san-andres-hacia-bogota-dio-detalles-del-operativo-3597786
+2026-10-31  Política  3597731  2026-10-31 20:43:31.000  Cancillería confirmó traslado de la biblioteca Marco Fidel Suárez a la nueva sede de la Academia Diplomática                            https://www.eltiempo.com/politica/gobierno/cancilleria-confirmo-traslado-de-la-biblioteca-marco-fidel-suarez-a-la-nueva-sede-de-la-academia-diplomatica-3597731                                      
+2026-10-31  Política  3597729  2026-10-31 20:07:20.000  Gobierno de Abelardo De La Espriella anunció que redujo $ 192.000 millones del presupuesto de la Presidencia y entidades adscritas      https://www.eltiempo.com/politica/gobierno/gobierno-de-abelardo-de-la-espriella-anuncio-que-redujo-192-000-millones-del-presupuesto-de-la-presidencia-y-entidades-adscritas-3597729                  
+2026-10-31  Política  3597705  2026-10-31 17:00:06.000  Presidente Abelardo De La Espriella anunció que asignará siete países a embajadores carrera: cinco ya eran ocupados                     https://www.eltiempo.com/politica/abelardo-de-la-espriella/presidente-abelardo-de-la-espriella-anuncio-que-asignara-siete-paises-a-embajadores-carrera-cinco-ya-eran-ocupados-3597705                
+2026-10-31  Política  3597695  2026-10-31 16:56:32.000  Abelardo De La Espriella oficializa nombramiento de Alejandro Ordóñez como ministro del Interior en reemplazo de Rodrigo Lara Restrepo  https://www.eltiempo.com/politica/gobierno/abelardo-de-la-espriella-oficializa-nombramiento-de-alejandro-ordonez-como-ministro-del-interior-en-reemplazo-de-rodrigo-lara-restrepo-3597695            
+2026-10-31  Política  3597655  2026-10-31 15:29:37.000  Así se gestó el regreso de Thomas Greg & Sons a la operación de los pasaportes: ¿se viene demanda de Portugal?                          https://www.eltiempo.com/politica/gobierno/asi-se-gesto-el-regreso-de-thomas-greg-sons-a-la-operacion-de-los-pasaportes-se-viene-demanda-de-portugal-3597655                                         
+[6 filas | 6,548 bytes escaneados | 575 ms | 9446b5fd-84dc-41e7-869f-6f06081bcb43]

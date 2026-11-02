@@ -1,0 +1,29 @@
+== 17. Athena, 03_presencia_entidad_por_dia.sql ==
+2026-11-02 13:36:48 -05  (18:36:48 UTC)  cuenta 726168540074  region us-east-2
+
+    -- Presencia diaria de una entidad y su cambio frente al dia anterior.
+    -- El calendario sale de gold_news_daily para que los dias sin menciones aparezcan con 0 y no desaparezcan.
+    WITH dias AS (
+        SELECT DISTINCT pub_date FROM gold_news_daily
+    ),
+    entidad AS (
+        SELECT pub_date, sum(n_noticias) AS noticias
+        FROM gold_entity_daily
+        WHERE entity_norm = 'gobierno'
+        GROUP BY pub_date
+    )
+    SELECT d.pub_date,
+           coalesce(e.noticias, 0) AS noticias,
+           coalesce(e.noticias, 0) - lag(coalesce(e.noticias, 0)) OVER (ORDER BY d.pub_date) AS cambio_vs_dia_anterior
+    FROM dias d
+    LEFT JOIN entidad e ON e.pub_date = d.pub_date
+    ORDER BY d.pub_date
+
+== 03_presencia_entidad_por_dia.sql
+pub_date    noticias  cambio_vs_dia_anterior
+----------  --------  ----------------------
+2026-10-30  1                               
+2026-10-31  3         2                     
+2026-11-01  4         1                     
+2026-11-02  1         -3                    
+[4 filas | 7,541 bytes escaneados | 1016 ms | bf16e8f2-1293-4ecd-a8a5-051e1bc1d8a1]

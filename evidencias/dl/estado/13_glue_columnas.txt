@@ -1,0 +1,39 @@
+== 13. Glue Data Catalog, columnas, tipos y formato ==
+2026-11-02 13:35:54 -05  (18:35:54 UTC)  cuenta 726168540074  region us-east-2
+
+silver_news  serde org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
+    news_id                  string
+    id_strategy              string
+    source_id                string
+    medio                    string
+    seccion                  string
+    sources_seen             array<string>
+    link                     string
+    guid                     string
+    title                    string
+    description              string
+    category                 string
+    pub_date_raw             string
+    published_at_utc         timestamp
+    nlp_text                 string
+    text_hash                string
+    version                  int
+    first_seen_run_id        string
+    content_run_id           string
+    content_ingested_at_utc  timestamp
+    bronze_uri               string
+    item_position            int
+    nlp_status               string
+    nlp_language             string
+    nlp_language_score       double
+    nlp_analyzed_at_utc      timestamp
+
+gold_entity_daily  serde org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
+    seccion         string
+    entity_type     string
+    entity_norm     string
+    entity_text     string
+    n_noticias      int
+    menciones       int
+    score_promedio  double
+

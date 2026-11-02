@@ -1,0 +1,22 @@
+== 11. Gold, indicadores por fecha ==
+2026-11-02 13:35:32 -05  (18:35:33 UTC)  cuenta 726168540074  region us-east-2
+
+Gold construido sobre el build de Silver b20261102T175946Z-df39bd
+
+pub_date    medio      seccion   n_noticias
+----------  ---------  --------  ----------
+2026-10-30  El Tiempo  Economía  4         
+2026-10-30  El Tiempo  Política  5         
+2026-10-31  El Tiempo  Economía  7         
+2026-10-31  El Tiempo  Mundo     11        
+2026-10-31  El Tiempo  Política  6         
+2026-11-01  El Tiempo  Economía  10        
+2026-11-01  El Tiempo  Mundo     11        
+2026-11-01  El Tiempo  Política  13        
+2026-11-02  El Tiempo  Economía  11        
+2026-11-02  El Tiempo  Mundo     6         
+2026-11-02  El Tiempo  Política  3         
+
+persona       Antonio Navarro Wolff (8), Abelardo De La Espriella (5), Presidente (4), Donald Trump (3), Gustavo Petro (3)
+organizacion  Gobierno (9), Congreso (4), Estados Unidos (3), EL (3), M-19 (3)
+lugar         Colombia (9), Cali (3), Estados Unidos (3), Medellín (2), Bogotá (2)

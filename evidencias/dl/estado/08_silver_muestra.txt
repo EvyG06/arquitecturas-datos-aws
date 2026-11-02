@@ -1,0 +1,15 @@
+== 08. Silver, noticias normalizadas con fecha UTC y valor original ==
+2026-11-02 13:34:48 -05  (18:34:48 UTC)  cuenta 726168540074  region us-east-2
+
+silver_news: 87 noticias vigentes, 87 news_id distintos
+
+news_id  id_strategy     seccion   pub_date    published_at_utc     pub_date_raw               version  title                                           
+-------  --------------  --------  ----------  -------------------  -------------------------  -------  ------------------------------------------------
+3597511  url_numeric_id  Política  2026-10-30  2026-10-30 17:59:49  2026-10-30T12:59:49-05:00  1        Plenaria del Senado aprueba ponencia de ley de s
+3597552  url_numeric_id  Economía  2026-10-30  2026-10-31 02:42:55  2026-10-30T21:42:55-05:00  1        Un niño también puede cambiar el mundo: José Ado
+3597559  url_numeric_id  Política  2026-10-30  2026-10-30 23:28:54  2026-10-30T18:28:54-05:00  1        Así es el trámite que le espera a la reforma tri
+3597566  url_numeric_id  Política  2026-10-30  2026-10-30 21:37:19  2026-10-30T16:37:19-05:00  1        Juvenal Infante se posesionó como embajador de C
+3597579  url_numeric_id  Política  2026-10-30  2026-10-30 21:27:06  2026-10-30T16:27:06-05:00  1        Las peticiones de los gobernadores de la Orinoqu
+3597636  url_numeric_id  Política  2026-10-30  2026-10-31 02:14:44  2026-10-30T21:14:44-05:00  1        Gobierno de Abelardo De La Espriella anuncia fin
+3597642  url_numeric_id  Economía  2026-10-30  2026-10-31 04:42:22  2026-10-30T23:42:22-05:00  1        Lotería de Risaralda del viernes 30 de octubre d
+3597646  url_numeric_id  Economía  2026-10-30  2026-10-31 04:43:46  2026-10-30T23:43:46-05:00  1        Lotería de Santander del viernes 30 de octubre d

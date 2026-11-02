@@ -1,0 +1,39 @@
+== 18. Athena, 04_frases_clave_por_seccion.sql ==
+2026-11-02 13:37:03 -05  (18:37:03 UTC)  cuenta 726168540074  region us-east-2
+
+    -- Cinco frases clave mas frecuentes por seccion, contando noticias distintas.
+    WITH total AS (
+        SELECT seccion, phrase_norm,
+               max_by(phrase_text, n_noticias) AS frase,
+               sum(n_noticias) AS noticias
+        FROM gold_key_phrase_daily
+        GROUP BY seccion, phrase_norm
+    ),
+    ranking AS (
+        SELECT *, row_number() OVER (PARTITION BY seccion ORDER BY noticias DESC, frase) AS puesto
+        FROM total
+    )
+    SELECT seccion, puesto, frase, noticias
+    FROM ranking
+    WHERE puesto <= 5
+    ORDER BY seccion, puesto
+
+== 04_frases_clave_por_seccion.sql
+seccion   puesto  frase                                noticias
+--------  ------  -----------------------------------  --------
+Economía  1       Colombia                             5       
+Economía  2       Gobierno                             3       
+Economía  3       Reforma tributaria                   3       
+Economía  4       Salario mínimo                       3       
+Economía  5       esta noche                           3       
+Mundo     1       Estados Unidos                       8       
+Mundo     2       Colombia                             3       
+Mundo     3       Elecciones                           3       
+Mundo     4       Francia                              3       
+Mundo     5       Protestas                            3       
+Política  1       Antonio Navarro Wolff                7       
+Política  2       Presidente Abelardo De La Espriella  4       
+Política  3       los 78 años                          4       
+Política  4       Gustavo Petro                        3       
+Política  5       Abelardo De La Espriella             2       
+[15 filas | 27,920 bytes escaneados | 639 ms | 402b6ad5-c4f1-4bd1-ab4d-2a5530017b96]

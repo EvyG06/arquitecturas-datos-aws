@@ -1,0 +1,49 @@
+== 02. Bucket unico del data lake y sus controles ==
+2026-11-02 13:32:58 -05  (18:32:58 UTC)  cuenta 726168540074  region us-east-2
+
+Bucket eve-dl-726168540074-us-east-2
+  cifrado por defecto    AES256
+  propiedad de objetos   BucketOwnerEnforced
+  versionado             Enabled
+  etiquetas              Component=dl	Project=arquitecturas-datos
+
+Bloqueo de acceso publico
+-----------------------------------
+|      GetPublicAccessBlock       |
++-------------------------+-------+
+|  BlockPublicAcls        |  True |
+|  BlockPublicPolicy      |  True |
+|  IgnorePublicAcls       |  True |
+|  RestrictPublicBuckets  |  True |
++-------------------------+-------+
+Ciclo de vida
+------------------------------------
+|  GetBucketLifecycleConfiguration |
++----------------------+-----------+
+|  versiones-viejas-7d |  Enabled  |
+|  athena-results-7d   |  Enabled  |
++----------------------+-----------+
+Politica del bucket
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "DenyInsecureTransport",
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3:::eve-dl-726168540074-us-east-2",
+                "arn:aws:s3:::eve-dl-726168540074-us-east-2/*"
+            ],
+            "Condition": {
+                "Bool": {
+                    "aws:SecureTransport": "false"
+                }
+            }
+        }
+    ]
+}
+
+Prueba del control, peticion firmada pero por HTTP sin TLS (debe fallar con explicit deny)
+aws: [ERROR]: An error occurred (AccessDenied) when calling the ListObjectsV2 operation: User: arn:aws:iam::726168540074:user/desarrollo_IngDatos is not authorized to perform: s3:ListBucket on resource: "arn:aws:s3:::eve-dl-726168540074-us-east-2" with an explicit deny in a resource-based policy

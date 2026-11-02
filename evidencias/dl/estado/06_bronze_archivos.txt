@@ -1,0 +1,51 @@
+== 06. Bronze, originales y metadatos del lote ==
+2026-11-02 13:34:07 -05  (18:34:07 UTC)  cuenta 726168540074  region us-east-2
+
+2026-10-31 18:14:15        633 bronze/source=eltiempo_economia/ingestion_date=2026-10-31/run_id=manual__primera/_meta.json
+2026-10-31 18:14:15      12939 bronze/source=eltiempo_economia/ingestion_date=2026-10-31/run_id=manual__primera/feed.xml
+2026-11-01 11:38:04        663 bronze/source=eltiempo_economia/ingestion_date=2026-11-01/run_id=manual__inc_20261101T163714Z/_meta.json
+2026-11-01 11:38:02      13200 bronze/source=eltiempo_economia/ingestion_date=2026-11-01/run_id=manual__inc_20261101T163714Z/feed.xml
+2026-11-02 12:56:58        667 bronze/source=eltiempo_economia/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/_meta.json
+2026-11-02 12:56:58      12567 bronze/source=eltiempo_economia/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/feed.xml
+2026-11-02 13:31:11        663 bronze/source=eltiempo_economia/ingestion_date=2026-11-02/run_id=manual__inc_20261102T183107Z/_meta.json
+2026-11-02 13:31:11      12426 bronze/source=eltiempo_economia/ingestion_date=2026-11-02/run_id=manual__inc_20261102T183107Z/feed.xml
+2026-10-31 18:14:16        620 bronze/source=eltiempo_mundo/ingestion_date=2026-10-31/run_id=manual__primera/_meta.json
+2026-10-31 18:14:16      13230 bronze/source=eltiempo_mundo/ingestion_date=2026-10-31/run_id=manual__primera/feed.xml
+2026-11-01 11:38:08        650 bronze/source=eltiempo_mundo/ingestion_date=2026-11-01/run_id=manual__inc_20261101T163714Z/_meta.json
+2026-11-01 11:38:06      13143 bronze/source=eltiempo_mundo/ingestion_date=2026-11-01/run_id=manual__inc_20261101T163714Z/feed.xml
+2026-11-02 12:57:11        654 bronze/source=eltiempo_mundo/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/_meta.json
+2026-11-02 12:57:11      12900 bronze/source=eltiempo_mundo/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/feed.xml
+2026-11-02 13:31:12        650 bronze/source=eltiempo_mundo/ingestion_date=2026-11-02/run_id=manual__inc_20261102T183107Z/_meta.json
+2026-11-02 13:31:12      12900 bronze/source=eltiempo_mundo/ingestion_date=2026-11-02/run_id=manual__inc_20261102T183107Z/feed.xml
+2026-10-31 18:14:14        633 bronze/source=eltiempo_politica/ingestion_date=2026-10-31/run_id=manual__primera/_meta.json
+2026-10-31 18:14:14      13353 bronze/source=eltiempo_politica/ingestion_date=2026-10-31/run_id=manual__primera/feed.xml
+2026-10-31 18:25:26        641 bronze/source=eltiempo_politica/ingestion_date=2026-10-31/run_id=prueba__fuente_rota/_meta.json
+2026-10-31 18:25:26      13353 bronze/source=eltiempo_politica/ingestion_date=2026-10-31/run_id=prueba__fuente_rota/feed.xml
+2026-11-01 11:37:58        663 bronze/source=eltiempo_politica/ingestion_date=2026-11-01/run_id=manual__inc_20261101T163714Z/_meta.json
+2026-11-01 11:37:57      13392 bronze/source=eltiempo_politica/ingestion_date=2026-11-01/run_id=manual__inc_20261101T163714Z/feed.xml
+2026-11-02 12:56:57        667 bronze/source=eltiempo_politica/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/_meta.json
+2026-11-02 12:56:56      13532 bronze/source=eltiempo_politica/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/feed.xml
+2026-11-02 13:31:10        663 bronze/source=eltiempo_politica/ingestion_date=2026-11-02/run_id=manual__inc_20261102T183107Z/_meta.json
+2026-11-02 13:31:10      13532 bronze/source=eltiempo_politica/ingestion_date=2026-11-02/run_id=manual__inc_20261102T183107Z/feed.xml
+2026-11-02 12:55:28        859 bronze/source=eltiempo_politica/ingestion_date=2026-11-02/run_id=prueba__controlada_20261101T163714Z/_meta.json
+2026-11-02 12:55:28      17892 bronze/source=eltiempo_politica/ingestion_date=2026-11-02/run_id=prueba__controlada_20261101T163714Z/feed.xml
+
+Registro del lote junto al original (bronze/source=eltiempo_politica/ingestion_date=2026-10-31/run_id=manual__primera/_meta.json):
+{
+  "run_id": "manual__primera",
+  "source_id": "eltiempo_politica",
+  "medio": "El Tiempo",
+  "seccion": "Política",
+  "url": "https://www.eltiempo.com/rss/politica.xml",
+  "ingestion_date": "2026-10-31",
+  "attempt": 1,
+  "http_status": 200,
+  "content_type": "text/xml; charset=UTF-8",
+  "ingested_at_utc": "2026-10-31T23:14:13+00:00",
+  "status": "ok",
+  "item_count": 10,
+  "bytes": 13353,
+  "sha256": "be266f981f7260508bdb74bace46562577036fbb5fc4522e04342ae339eba89a",
+  "error": null,
+  "s3_uri": "s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_politica/ingestion_date=2026-10-31/run_id=manual__primera/feed.xml"
+}

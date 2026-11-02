@@ -1,27 +1,20 @@
 == 2c. Nuevo lote incremental, Gold recalcula solo las fechas afectadas ==
-2026-11-02 12:53:19 -05  (17:53:19 UTC)  cuenta 726168540074  region us-east-2
+2026-11-02 13:31:41 -05  (18:31:41 UTC)  cuenta 726168540074  region us-east-2
 
-2026-11-02 12:53:21,943 INFO numexpr.utils NumExpr defaulting to 8 threads.
-2026-11-02 12:53:24,779 INFO dl.gold task=gold recalculadas=['2026-10-31', '2026-11-01'] eliminadas=[] sin_cambios=1
+2026-11-02 13:31:44,568 INFO dl.gold task=gold recalculadas=['2026-11-02'] eliminadas=[] sin_cambios=3
 {
-  "built_at_utc": "2026-11-02T17:53:24+00:00",
-  "silver_build_id": "b20261101T011531Z-11aee4",
+  "built_at_utc": "2026-11-02T18:31:44+00:00",
+  "silver_build_id": "b20261102T175946Z-df39bd",
   "fechas_recalculadas": [
-    "2026-10-31",
-    "2026-11-01"
+    "2026-11-02"
   ],
   "fechas_eliminadas": [],
-  "fechas_sin_cambios": 1,
+  "fechas_sin_cambios": 3,
   "conciliacion": {
-    "2026-10-31": {
-      "noticias": 24,
-      "pares_noticia_entidad": 107,
-      "pares_noticia_frase": 305
-    },
-    "2026-11-01": {
-      "noticias": 22,
-      "pares_noticia_entidad": 67,
-      "pares_noticia_frase": 280
+    "2026-11-02": {
+      "noticias": 20,
+      "pares_noticia_entidad": 55,
+      "pares_noticia_frase": 247
     }
   }
 }

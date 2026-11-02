@@ -1,0 +1,16 @@
+== 12. Glue Data Catalog, base y tablas ==
+2026-11-02 13:35:43 -05  (18:35:43 UTC)  cuenta 726168540074  region us-east-2
+
+Base de datos  arq_dl	Data lake de noticias RSS (EIA)
+------------------------------------------------------------------------------------------------------------------------
+|                                                       GetTables                                                      |
++---------+----------------+--------------------------+----------------------------------------------------------------+
+| formato |   particion    |          tabla           |                           ubicacion                            |
++---------+----------------+--------------------------+----------------------------------------------------------------+
+|  parquet|  pub_date date |  gold_entity_daily       |  s3://eve-dl-726168540074-us-east-2/gold/entity_daily/         |
+|  parquet|  pub_date date |  gold_key_phrase_daily   |  s3://eve-dl-726168540074-us-east-2/gold/key_phrase_daily/     |
+|  parquet|  pub_date date |  gold_news_daily         |  s3://eve-dl-726168540074-us-east-2/gold/news_daily/           |
+|  parquet|  pub_date date |  silver_news             |  s3://eve-dl-726168540074-us-east-2/silver/news/               |
+|  parquet|  pub_date date |  silver_news_entities    |  s3://eve-dl-726168540074-us-east-2/silver/news_entities/      |
+|  parquet|  pub_date date |  silver_news_key_phrases |  s3://eve-dl-726168540074-us-east-2/silver/news_key_phrases/   |
++---------+----------------+--------------------------+----------------------------------------------------------------+

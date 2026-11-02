@@ -1,0 +1,7 @@
+== 23. Athena, bytes escaneados con y sin filtro de particion ==
+2026-11-02 13:37:58 -05  (18:37:58 UTC)  cuenta 726168540074  region us-east-2
+
+== 07a_con_filtro_de_particion.sql
+[3 filas | 3,211 bytes escaneados | 568 ms | f6ca8869-478b-433f-8a00-79975d6b4917]
+== 07b_sin_filtro_de_particion.sql
+[3 filas | 11,105 bytes escaneados | 522 ms | 35a792ea-9e4b-4b7d-83a8-1cfd40bb1716]

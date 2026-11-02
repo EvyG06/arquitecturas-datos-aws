@@ -1,0 +1,40 @@
+== 20. Athena, 06_validaciones_calidad.sql ==
+2026-11-02 13:37:27 -05  (18:37:27 UTC)  cuenta 726168540074  region us-east-2
+
+    -- Validaciones de calidad sobre el conjunto vigente. Toda fila debe tener fallas = 0.
+    SELECT 'news_id duplicado en vigentes' AS validacion,
+           count(*) - count(DISTINCT news_id) AS fallas
+    FROM silver_news
+    UNION ALL
+    SELECT 'campos obligatorios vacios',
+           count_if(news_id IS NULL OR title IS NULL OR title = '' OR link IS NULL OR published_at_utc IS NULL)
+    FROM silver_news
+    UNION ALL
+    SELECT 'enlace fuera de eltiempo.com o sin https',
+           count_if(NOT regexp_like(link, '^https://([a-z0-9-]+\.)*eltiempo\.com/'))
+    FROM silver_news
+    UNION ALL
+    SELECT 'fecha de publicacion fuera de rango',
+           count_if(published_at_utc > localtimestamp + INTERVAL '1' DAY OR year(published_at_utc) < 2000)
+    FROM silver_news
+    UNION ALL
+    SELECT 'entidades sin noticia vigente', count(*)
+    FROM silver_news_entities e
+    LEFT JOIN silver_news n ON n.news_id = e.news_id AND n.pub_date = e.pub_date
+    WHERE n.news_id IS NULL
+    UNION ALL
+    SELECT 'frases clave sin noticia vigente', count(*)
+    FROM silver_news_key_phrases k
+    LEFT JOIN silver_news n ON n.news_id = k.news_id AND n.pub_date = k.pub_date
+    WHERE n.news_id IS NULL
+
+== 06_validaciones_calidad.sql
+validacion                                fallas
+----------------------------------------  ------
+enlace fuera de eltiempo.com o sin https  0     
+campos obligatorios vacios                0     
+fecha de publicacion fuera de rango       0     
+news_id duplicado en vigentes             0     
+entidades sin noticia vigente             0     
+frases clave sin noticia vigente          0     
+[6 filas | 38,449 bytes escaneados | 1204 ms | c4d499b3-8753-4925-93d3-5e89d6459f4b]

@@ -1,0 +1,29 @@
+== 07. Silver, manifiesto vigente y lotes publicados ==
+2026-11-02 13:34:40 -05  (18:34:40 UTC)  cuenta 726168540074  region us-east-2
+
+Manifiesto de Silver  build_id=b20261102T175946Z-df39bd
+
+conjunto          pub_date    archivo_vigente                                                                                                         
+----------------  ----------  ------------------------------------------------------------------------------------------------------------------------
+news              2026-10-30  silver/news/pub_date=2026-10-30/v=b20261102T175946Z-df39bd-manual__primera/part-00000.parquet                           
+news              2026-10-31  silver/news/pub_date=2026-10-31/v=b20261102T175946Z-df39bd-manual__inc_20261101T163714Z/part-00000.parquet              
+news              2026-11-01  silver/news/pub_date=2026-11-01/v=b20261102T175946Z-df39bd-manual__fallo_20261101T163714Z/part-00000.parquet            
+news              2026-11-02  silver/news/pub_date=2026-11-02/v=b20261102T175946Z-df39bd-manual__inc_20261102T183107Z/part-00000.parquet              
+news_entities     2026-10-30  silver/news_entities/pub_date=2026-10-30/v=b20261102T175946Z-df39bd-manual__primera/part-00000.parquet                  
+news_entities     2026-10-31  silver/news_entities/pub_date=2026-10-31/v=b20261102T175946Z-df39bd-manual__inc_20261101T163714Z/part-00000.parquet     
+news_entities     2026-11-01  silver/news_entities/pub_date=2026-11-01/v=b20261102T175946Z-df39bd-manual__fallo_20261101T163714Z/part-00000.parquet   
+news_entities     2026-11-02  silver/news_entities/pub_date=2026-11-02/v=b20261102T175946Z-df39bd-manual__inc_20261102T183107Z/part-00000.parquet     
+news_key_phrases  2026-10-30  silver/news_key_phrases/pub_date=2026-10-30/v=b20261102T175946Z-df39bd-manual__primera/part-00000.parquet               
+news_key_phrases  2026-10-31  silver/news_key_phrases/pub_date=2026-10-31/v=b20261102T175946Z-df39bd-manual__inc_20261101T163714Z/part-00000.parquet  
+news_key_phrases  2026-11-01  silver/news_key_phrases/pub_date=2026-11-01/v=b20261102T175946Z-df39bd-manual__fallo_20261101T163714Z/part-00000.parquet
+news_key_phrases  2026-11-02  silver/news_key_phrases/pub_date=2026-11-02/v=b20261102T175946Z-df39bd-manual__inc_20261102T183107Z/part-00000.parquet  
+
+Lotes publicados en el estado vigente
+run_id                               procesamientos  nuevas_1ro  nuevas_ult  repetidas_ult  actualizadas_ult  rechazados_ult  comprehend_ult
+-----------------------------------  --------------  ----------  ----------  -------------  ----------------  --------------  --------------
+manual__primera                      1               30          30          0              0                 0               0             
+prueba__fuente_rota                  1               0           0           10             0                 0               0             
+manual__inc_20261101T163714Z         1               25          25          4              1                 0               0             
+prueba__controlada_20261101T163714Z  1               0           0           9              1                 3               0             
+manual__fallo_20261101T163714Z       1               30          30          0              0                 0               0             
+manual__inc_20261102T183107Z         1               2           2           28             0                 0               2             

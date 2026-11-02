@@ -1,0 +1,46 @@
+== 10. Resultados de Amazon Comprehend ==
+2026-11-02 13:35:13 -05  (18:35:13 UTC)  cuenta 726168540074  region us-east-2
+
+Estado de procesamiento: {'analizado': 87} | idioma: {'es': 87}
+news_entities: 284 filas {'organizacion': 115, 'persona': 96, 'lugar': 73} | news_key_phrases: 1076 filas
+
+news_id  entity_type   entity_text            score               mentions
+-------  ------------  ---------------------  ------------------  --------
+3597511  organizacion  Plenaria del Senado    0.6300115585327148  1       
+3597552  organizacion  Banco del Estudiante   0.9975074529647827  1       
+3597552  persona       José Adolfo Quisocala  0.9994125366210938  1       
+3597559  organizacion  Centro Democrático     0.9919266104698181  1       
+3597559  organizacion  Congreso               0.7569718360900879  1       
+3597559  persona       La Espriella           0.4549991488456726  1       
+3597566  lugar         Palacio de San Carlos  0.9867463111877441  1       
+3597566  organizacion  China                  0.948196291923523   1       
+
+news_id  phrase_text    score               mentions
+-------  -------------  ------------------  --------
+3597511  el trámite     0.9999644756317139  1       
+3597511  La iniciativa  0.9999873638153076  1       
+3597511  la propuesta   0.9999655485153198  1       
+3597511  la protección  0.9999069571495056  1       
+3597511  la sesión      0.9999699592590332  1       
+
+Cache inmutable cache/comprehend/46/460f9d0a78096c7179c30dd406c796b0d320497e05494c1a2e1444ce22f08de6.json
+{
+  "text_hash": "460f9d0a78096c7179c30dd406c796b0d320497e05494c1a2e1444ce22f08de6",
+  "status": "analizado",
+  "language": "es",
+  "language_score": 0.9989335536956787,
+  "analyzed_at_utc": "2026-11-01T01:15:18+00:00",
+  "nlp_text": "Plenaria del Senado aprueba ponencia de ley de sometimiento y levanta la sesión: se aprietan los tiempos para el trámite de la propuesta. La",
+  "entities": [
+    {
+      "Type": "ORGANIZATION",
+      "Text": "Plenaria del Senado",
+      "Score": 0.6300115585327148
+    },
+    {
+      "Type": "DATE",
+      "Text": "4 de noviembre",
+      "Score": 0.9977944493293762
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+== 04. Fuentes RSS seleccionadas ==
+2026-11-02 13:33:49 -05  (18:33:49 UTC)  cuenta 726168540074  region us-east-2
+
+Configuracion versionada en data-lake/config/sources.json
+[
+    {
+        "source_id": "eltiempo_politica",
+        "medio": "El Tiempo",
+        "seccion": "Pol\u00edtica",
+        "url": "https://www.eltiempo.com/rss/politica.xml"
+    },
+    {
+        "source_id": "eltiempo_economia",
+        "medio": "El Tiempo",
+        "seccion": "Econom\u00eda",
+        "url": "https://www.eltiempo.com/rss/economia.xml"
+    },
+    {
+        "source_id": "eltiempo_mundo",
+        "medio": "El Tiempo",
+        "seccion": "Mundo",
+        "url": "https://www.eltiempo.com/rss/mundo.xml"
+    }
+]
+
+Estado actual de cada feed
+  eltiempo_politica http=200 tipo=text/xml; charset=UTF-8 bytes=13532 items=10
+  eltiempo_economia http=200 tipo=text/xml; charset=UTF-8 bytes=12426 items=10
+  eltiempo_mundo http=200 tipo=text/xml; charset=UTF-8 bytes=12900 items=10

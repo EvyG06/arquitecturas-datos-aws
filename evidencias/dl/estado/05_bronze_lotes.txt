@@ -1,0 +1,20 @@
+== 05. Bronze, registro por lote y fuente ==
+2026-11-02 13:33:57 -05  (18:33:57 UTC)  cuenta 726168540074  region us-east-2
+
+run_id                               inicio_utc                     lote      fuente             estado      http  items
+-----------------------------------  -----------------------------  --------  -----------------  ----------  ----  -----
+manual__primera                      2026-10-31T23:14:11+00:00      complete  eltiempo_economia  ok          200   10   
+manual__primera                      2026-10-31T23:14:11+00:00      complete  eltiempo_mundo     ok          200   10   
+manual__primera                      2026-10-31T23:14:11+00:00      complete  eltiempo_politica  ok          200   10   
+prueba__fuente_rota                  2026-10-31T23:25:24+00:00      partial   eltiempo_politica  ok          200   10   
+prueba__fuente_rota                  2026-10-31T23:25:24+00:00      partial   fuente_rota        http_error  404        
+manual__inc_20261101T163714Z         2026-11-01T16:37:52.577+00:00  complete  eltiempo_economia  ok          200   10   
+manual__inc_20261101T163714Z         2026-11-01T16:37:52.577+00:00  complete  eltiempo_mundo     ok          200   10   
+manual__inc_20261101T163714Z         2026-11-01T16:37:52.577+00:00  complete  eltiempo_politica  ok          200   10   
+prueba__controlada_20261101T163714Z  2026-11-02T17:55:26.928+00:00  complete  eltiempo_politica  ok          200   14   
+manual__fallo_20261101T163714Z       2026-11-02T17:56:54.292+00:00  complete  eltiempo_economia  ok          200   10   
+manual__fallo_20261101T163714Z       2026-11-02T17:56:54.292+00:00  complete  eltiempo_mundo     ok          200   10   
+manual__fallo_20261101T163714Z       2026-11-02T17:56:54.292+00:00  complete  eltiempo_politica  ok          200   10   
+manual__inc_20261102T183107Z         2026-11-02T18:31:07.842+00:00  complete  eltiempo_economia  ok          200   10   
+manual__inc_20261102T183107Z         2026-11-02T18:31:07.842+00:00  complete  eltiempo_mundo     ok          200   10   
+manual__inc_20261102T183107Z         2026-11-02T18:31:07.842+00:00  complete  eltiempo_politica  ok          200   10   

@@ -1,0 +1,41 @@
+== 24. Pruebas automatizadas del pipeline ==
+2026-11-02 13:38:10 -05  (18:38:10 UTC)  cuenta 726168540074  region us-east-2
+
+============================= test session starts ==============================
+platform darwin -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /Users/evelyn/anaconda3/envs/arq-aws/bin/python
+rootdir: /Users/evelyn/arquitecturas-datos-aws
+collecting ... collected 31 items
+
+data-lake/tests/test_catalog.py::test_tipos_de_glue PASSED               [  3%]
+data-lake/tests/test_catalog.py::test_todas_las_columnas_tienen_tipo_en_glue PASSED [  6%]
+data-lake/tests/test_catalog.py::test_plan_de_particiones PASSED         [  9%]
+data-lake/tests/test_controlled.py::test_copia_controlada_produce_cambio_duplicado_y_defectos PASSED [ 12%]
+data-lake/tests/test_enrich.py::test_precheck PASSED                     [ 16%]
+data-lake/tests/test_enrich.py::test_estados_explicitos PASSED           [ 19%]
+data-lake/tests/test_enrich.py::test_entidad_distinta_por_noticia PASSED [ 22%]
+data-lake/tests/test_enrich.py::test_frase_clave_distinta PASSED         [ 25%]
+data-lake/tests/test_gold.py::test_cuenta_noticias_distintas_no_menciones PASSED [ 29%]
+data-lake/tests/test_gold.py::test_conciliacion_cuadra PASSED            [ 32%]
+data-lake/tests/test_gold.py::test_conciliacion_detecta_descuadre PASSED [ 35%]
+data-lake/tests/test_gold.py::test_entidad_sin_noticia_falla PASSED      [ 38%]
+data-lake/tests/test_parse.py::test_id_numerico_de_la_url PASSED         [ 41%]
+data-lake/tests/test_parse.py::test_id_de_respaldo_por_hash PASSED       [ 45%]
+data-lake/tests/test_parse.py::test_limpia_html_y_entidades PASSED       [ 48%]
+data-lake/tests/test_parse.py::test_mismo_instante_en_iso_y_rfc822 PASSED [ 51%]
+data-lake/tests/test_parse.py::test_fecha_sin_zona_es_invalida PASSED    [ 54%]
+data-lake/tests/test_parse.py::test_rechazos_con_motivo_en_orden PASSED  [ 58%]
+data-lake/tests/test_parse.py::test_dia_de_negocio_en_bogota PASSED      [ 61%]
+data-lake/tests/test_parse.py::test_rechaza_xxe PASSED                   [ 64%]
+data-lake/tests/test_pipeline_e2e.py::test_escenarios_bronze_silver PASSED [ 67%]
+data-lake/tests/test_pipeline_e2e.py::test_gold_es_incremental_e_idempotente PASSED [ 70%]
+data-lake/tests/test_pipeline_e2e.py::test_copia_controlada_fuente_caida_y_fallo_controlado PASSED [ 74%]
+data-lake/tests/test_pipeline_e2e.py::test_etapas_separadas_con_fallo_y_reintento PASSED [ 77%]
+data-lake/tests/test_pipeline_e2e.py::test_publicar_rechaza_plan_sobre_estado_cambiado PASSED [ 80%]
+data-lake/tests/test_silver.py::test_duplicado_entre_feeds_del_mismo_lote PASSED [ 83%]
+data-lake/tests/test_silver.py::test_nueva_repetida_actualizada_obsoleta PASSED [ 87%]
+data-lake/tests/test_silver.py::test_repetir_un_lote_no_cambia_nada PASSED [ 90%]
+data-lake/tests/test_silver.py::test_cambio_de_fecha_reescribe_ambas_particiones PASSED [ 93%]
+data-lake/tests/test_validate.py::test_detecta_descuadre_y_fallas PASSED [ 96%]
+data-lake/tests/test_validate.py::test_todo_ok PASSED                    [100%]
+
+============================== 31 passed in 1.75s ==============================

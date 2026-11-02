@@ -1,0 +1,39 @@
+== 19. Athena, 05_conciliacion_gold_vs_silver.sql ==
+2026-11-02 13:37:13 -05  (18:37:13 UTC)  cuenta 726168540074  region us-east-2
+
+    -- Conciliacion: noticias distintas en Silver contra la suma de Gold, por fecha y seccion.
+    -- FULL OUTER JOIN para que una fila que exista en un lado y no en el otro tambien aparezca como descuadre.
+    WITH s AS (
+        SELECT pub_date, seccion, count(DISTINCT news_id) AS silver
+        FROM silver_news
+        GROUP BY pub_date, seccion
+    ),
+    g AS (
+        SELECT pub_date, seccion, sum(n_noticias) AS gold
+        FROM gold_news_daily
+        GROUP BY pub_date, seccion
+    )
+    SELECT coalesce(s.pub_date, g.pub_date) AS pub_date,
+           coalesce(s.seccion, g.seccion) AS seccion,
+           s.silver,
+           g.gold,
+           CASE WHEN s.silver = g.gold THEN 'OK' ELSE 'DESCUADRE' END AS estado
+    FROM s
+    FULL OUTER JOIN g ON s.pub_date = g.pub_date AND s.seccion = g.seccion
+    ORDER BY 1, 2
+
+== 05_conciliacion_gold_vs_silver.sql
+pub_date    seccion   silver  gold  estado
+----------  --------  ------  ----  ------
+2026-10-30  Economía  4       4     OK    
+2026-10-30  Política  5       5     OK    
+2026-10-31  Economía  7       7     OK    
+2026-10-31  Mundo     11      11    OK    
+2026-10-31  Política  6       6     OK    
+2026-11-01  Economía  10      10    OK    
+2026-11-01  Mundo     11      11    OK    
+2026-11-01  Política  13      13    OK    
+2026-11-02  Economía  11      11    OK    
+2026-11-02  Mundo     6       6     OK    
+2026-11-02  Política  3       3     OK    
+[11 filas | 1,989 bytes escaneados | 914 ms | 0e06f6f6-f2b4-497a-8440-ba841e34b1ad]

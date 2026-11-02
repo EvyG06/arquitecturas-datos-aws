@@ -1,0 +1,28 @@
+== 16. Athena, 02_top10_organizaciones.sql ==
+2026-11-02 13:36:35 -05  (18:36:35 UTC)  cuenta 726168540074  region us-east-2
+
+    -- Diez organizaciones presentes en mas noticias distintas, sumando todas las fechas y secciones.
+    -- Sumar n_noticias es valido porque cada noticia tiene una sola fecha y una sola seccion primaria.
+    SELECT max_by(entity_text, n_noticias) AS organizacion,
+           sum(n_noticias) AS noticias,
+           sum(menciones) AS menciones
+    FROM gold_entity_daily
+    WHERE entity_type = 'organizacion'
+    GROUP BY entity_norm
+    ORDER BY noticias DESC, organizacion
+    LIMIT 10
+
+== 02_top10_organizaciones.sql
+organizacion    noticias  menciones
+--------------  --------  ---------
+Gobierno        9         9        
+Congreso        4         4        
+EL              3         3        
+Estados Unidos  3         3        
+M-19            3         3        
+Estado          2         2        
+Petro           2         2        
+Washington      2         2        
+ACPM            1         1        
+ANT             1         1        
+[10 filas | 9,119 bytes escaneados | 776 ms | 73372bf8-7b61-48fa-a25b-8dd3e36133b0]

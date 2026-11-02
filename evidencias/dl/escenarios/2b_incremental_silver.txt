@@ -1,28 +1,40 @@
 == 2b. Nuevo lote incremental, Silver solo agrega lo nuevo ==
-2026-11-02 12:53:10 -05  (17:53:10 UTC)  cuenta 726168540074  region us-east-2
+2026-11-02 13:31:21 -05  (18:31:21 UTC)  cuenta 726168540074  region us-east-2
 
-2026-11-02 12:53:11,767 INFO dl.silver task=silver run_id=manual__inc_20261101T163714Z ya procesado, se omite
+2026-11-02 13:31:28,660 INFO dl.silver task=silver run_id=manual__inc_20261102T183107Z aplicado build=b20261102T175946Z-df39bd nuevas=2 repetidas=28 actualizadas=0 obsoletas=0 rechazados=0 particiones=['2026-11-02'] comprehend_textos=2 cache_hits=18
+2026-11-02 13:31:29,091 INFO dl.silver task=silver run_id=manual__inc_20261102T183107Z publicado build=b20261102T175946Z-df39bd
 {
-  "primero": {
-    "processed_at_utc": "2026-11-01T16:39:18+00:00",
-    "build_id": "b20261101T011531Z-11aee4",
-    "nuevas": 25,
-    "repetidas": 4,
-    "actualizadas": 1,
-    "obsoletas": 0,
-    "rechazados": 0,
-    "textos_enviados_comprehend": 26
+  "run_id": "manual__inc_20261102T183107Z",
+  "build_id": "b20261102T175946Z-df39bd",
+  "bronze_status": "complete",
+  "fuentes_procesadas": [
+    "eltiempo_economia",
+    "eltiempo_mundo",
+    "eltiempo_politica"
+  ],
+  "items_recibidos": 30,
+  "validos": 30,
+  "rechazados": 0,
+  "rechazos_por_motivo": {},
+  "duplicados_en_lote": 0,
+  "noticias_unicas_en_lote": 30,
+  "nuevas": 2,
+  "repetidas": 28,
+  "actualizadas": 0,
+  "obsoletas": 0,
+  "particiones_afectadas": [
+    "2026-11-02"
+  ],
+  "particiones_escritas": [
+    "2026-11-02"
+  ],
+  "noticias_vigentes_total": 87,
+  "nlp": {
+    "cache_hits": 18,
+    "textos_enviados": 2,
+    "analizado": 20
   },
-  "ultimo": {
-    "processed_at_utc": "2026-11-01T16:39:18+00:00",
-    "build_id": "b20261101T011531Z-11aee4",
-    "nuevas": 25,
-    "repetidas": 4,
-    "actualizadas": 1,
-    "obsoletas": 0,
-    "rechazados": 0,
-    "textos_enviados_comprehend": 26
-  },
-  "procesamientos": 1,
-  "skipped": true
+  "entidades_en_particiones_escritas": 55,
+  "frases_en_particiones_escritas": 247,
+  "processed_at_utc": "2026-11-02T18:31:28+00:00"
 }
