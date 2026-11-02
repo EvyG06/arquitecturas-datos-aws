@@ -1,0 +1,8 @@
+# Rol arq-datos-pipeline: allowed = permitido, implicitDeny = sin permiso
+secretsmanager:GetSecretValue  implicitDeny  arn:aws:secretsmanager:us-east-2:726168540074:secret:rds!db-045bc179-3d89-4dae-ab44-c46c40cb96b0-FPHeyy
+secretsmanager:GetSecretValue  implicitDeny  arn:aws:secretsmanager:us-east-2:726168540074:secret:rds!cluster-91eb9d39-0248-4194-b4ba-829631a00b1d-dbecWk
+secretsmanager:GetSecretValue  allowed       arn:aws:secretsmanager:us-east-2:726168540074:secret:arq-datos/dw/mysql-lector-LTEafZ
+secretsmanager:GetSecretValue  allowed       arn:aws:secretsmanager:us-east-2:726168540074:secret:arq-datos/dw/docdb-lector-IhwYE9
+s3:DeleteObject                implicitDeny  arn:aws:s3:::eve-dw-726168540074-us-east-2/raw/mysql/orders/batch_id=x/part-00000.parquet
+s3:DeleteObject                allowed       arn:aws:s3:::eve-dw-726168540074-us-east-2/_control/extraction/batch_id=x/plan.json
+s3:PutObject                   allowed       arn:aws:s3:::eve-dw-726168540074-us-east-2/raw/mysql/orders/batch_id=x/part-00000.parquet

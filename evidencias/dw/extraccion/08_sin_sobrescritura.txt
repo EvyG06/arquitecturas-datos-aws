@@ -1,0 +1,2 @@
+Resultado inesperado: 
+aws: [ERROR]: An error occurred (ParamValidation): Error parsing parameter '--body': Blob values must be a path to a file.

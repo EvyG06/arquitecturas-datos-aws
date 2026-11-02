@@ -1,0 +1,11 @@
+# Fila 5 del DAG (manual__2026-11-02T19:38:59): fallo controlado en el intento 1 y exito en el 2
+== attempt=1.log
+[2026-11-02T19:41:28.505+0000] {subprocess.py:106} INFO - 2026-11-02 19:41:28,505 ERROR dl.silver task=silver fallo controlado en silver_antes_de_publicar run_id=manual__inc_20261102T183107Z, no se publico nada
+[2026-11-02T19:41:28.615+0000] {subprocess.py:110} INFO - Command exited with return code 1
+[2026-11-02T19:41:28.642+0000] {taskinstance.py:1242} INFO - Marking task as UP_FOR_RETRY. dag_id=dl_noticias_rss, task_id=publicar_silver, run_id=manual__2026-11-02T19:38:59+00:00, execution_date=20261102T193859, start_
+[2026-11-02T19:41:28.698+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 1
+== attempt=2.log
+[2026-11-02T19:42:44.611+0000] {subprocess.py:110} INFO - Command exited with return code 0
+[2026-11-02T19:42:44.653+0000] {taskinstance.py:361} INFO - Marking task as SUCCESS. dag_id=dl_noticias_rss, task_id=publicar_silver, run_id=manual__2026-11-02T19:38:59+00:00, execution_date=20261102T193859, start_date=2
+[2026-11-02T19:42:44.703+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[ssm 0c612a43-3eb5-46f0-a0b1-ff15722604ec | estado Success | codigo 0]

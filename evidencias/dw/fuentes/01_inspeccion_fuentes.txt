@@ -1,0 +1,14 @@
+# Fase 4a, paso 12: inspect_sources (rol arq-datos-fuentes, credenciales maestras y del lector)
+RDS MySQL 8.4.11 | TLS TLSv1.3 TLS_AES_256_GCM_SHA384 | require_secure_transport=ON
+  customers             54  max _cdc_ts 2026-11-02 21:36:52.744530
+  products              27  max _cdc_ts 2026-11-02 21:36:52.745556
+  orders               106  max _cdc_ts 2026-11-02 21:36:52.746420
+  order_items          259  max _cdc_ts 2026-11-02 21:36:52.747228
+  conexion sin TLS: rechazada: Connections using insecure transport are prohibited while --require_secure_transport=ON.
+  usuario lector: etl_lector@% lee 54 clientes | escritura denegada: INSERT command denied to user 'etl_lector'@'172.31.44.125' for table 'customers'
+DocumentDB (compatibilidad MongoDB 5.0.0) | TLS obligatorio con CA de AWS
+  reviews              158  validador=si  con _cdc_ts=158
+  navigation_events    508  validador=si  con _cdc_ts=508
+  conexion sin TLS: rechazada: ServerSelectionTimeoutError
+  usuario lector: etl_lector lee 158 resenas | escritura denegada: OperationFailure
+[ssm 96149466-9943-4170-bd84-057787f9c9a7 | estado Success | codigo 0]

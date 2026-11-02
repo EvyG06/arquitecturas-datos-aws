@@ -1,0 +1,13 @@
+seq=3 ultimo_lote=ext_03_fallo_y_reintento_negocio3
+  marca documentdb.navigation_events   2026-11-02T21:43:56.706245+00:00
+  marca documentdb.reviews             2026-11-02T21:43:56.706245+00:00
+  marca mysql.customers                2026-11-02T21:43:56.704319+00:00
+  marca mysql.order_items              2026-11-02T21:43:56.704319+00:00
+  marca mysql.orders                   2026-11-02T21:43:56.704319+00:00
+  marca mysql.products                 2026-11-02T21:43:56.704319+00:00
+seq  modo        filas  batch_id
+  1  inicial      1112  ext_01_inicial
+  2  incremental    12  ext_02_incremental_negocio2
+  3  incremental    24  ext_03_fallo_y_reintento_negocio3
+	
+[ssm 891b9451-f53a-4fe2-a630-4a636f2bd7b7 | estado Success | codigo 0]

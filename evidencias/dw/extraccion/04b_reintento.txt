@@ -1,0 +1,12 @@
+batch_id=ext_03_fallo_y_reintento_negocio3 reintento: se reutiliza la ventana planificada modo=incremental base_seq=2
+batch_id=ext_03_fallo_y_reintento_negocio3 entidad extraida entidad=documentdb.reviews filas=6 solape=3 bytes=6293
+batch_id=ext_03_fallo_y_reintento_negocio3 entidad extraida entidad=documentdb.navigation_events filas=6 solape=3 bytes=6471
+batch_id=ext_03_fallo_y_reintento_negocio3 lote confirmado seq=3 modo=incremental filas=24
+  mysql.customers                filas=   0 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/mysql/customers/batch_id=ext_03_fallo_y_reintento_negocio3/part-00000.parquet
+  mysql.products                 filas=   0 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/mysql/products/batch_id=ext_03_fallo_y_reintento_negocio3/part-00000.parquet
+  mysql.orders                   filas=   6 solape=  3  s3://eve-dw-726168540074-us-east-2/raw/mysql/orders/batch_id=ext_03_fallo_y_reintento_negocio3/part-00000.parquet
+  mysql.order_items              filas=   6 solape=  3  s3://eve-dw-726168540074-us-east-2/raw/mysql/order_items/batch_id=ext_03_fallo_y_reintento_negocio3/part-00000.parquet
+  documentdb.reviews             filas=   6 solape=  3  s3://eve-dw-726168540074-us-east-2/raw/documentdb/reviews/batch_id=ext_03_fallo_y_reintento_negocio3/part-00000.parquet
+  documentdb.navigation_events   filas=   6 solape=  3  s3://eve-dw-726168540074-us-east-2/raw/documentdb/navigation_events/batch_id=ext_03_fallo_y_reintento_negocio3/part-00000.parquet
+	
+[ssm dbabd3da-9927-40c1-87fd-6461ec134c7d | estado Success | codigo 0]

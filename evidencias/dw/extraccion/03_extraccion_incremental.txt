@@ -1,0 +1,16 @@
+batch_id=ext_02_incremental_negocio2 lote planificado modo=incremental base_seq=1
+batch_id=ext_02_incremental_negocio2 entidad extraida entidad=mysql.customers filas=0 solape=0 bytes=2068
+batch_id=ext_02_incremental_negocio2 entidad extraida entidad=mysql.products filas=0 solape=0 bytes=1917
+batch_id=ext_02_incremental_negocio2 entidad extraida entidad=mysql.orders filas=3 solape=0 bytes=3556
+batch_id=ext_02_incremental_negocio2 entidad extraida entidad=mysql.order_items filas=3 solape=0 bytes=3430
+batch_id=ext_02_incremental_negocio2 entidad extraida entidad=documentdb.reviews filas=3 solape=0 bytes=5861
+batch_id=ext_02_incremental_negocio2 entidad extraida entidad=documentdb.navigation_events filas=3 solape=0 bytes=6245
+batch_id=ext_02_incremental_negocio2 lote confirmado seq=2 modo=incremental filas=12
+  mysql.customers                filas=   0 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/mysql/customers/batch_id=ext_02_incremental_negocio2/part-00000.parquet
+  mysql.products                 filas=   0 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/mysql/products/batch_id=ext_02_incremental_negocio2/part-00000.parquet
+  mysql.orders                   filas=   3 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/mysql/orders/batch_id=ext_02_incremental_negocio2/part-00000.parquet
+  mysql.order_items              filas=   3 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/mysql/order_items/batch_id=ext_02_incremental_negocio2/part-00000.parquet
+  documentdb.reviews             filas=   3 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/documentdb/reviews/batch_id=ext_02_incremental_negocio2/part-00000.parquet
+  documentdb.navigation_events   filas=   3 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/documentdb/navigation_events/batch_id=ext_02_incremental_negocio2/part-00000.parquet
+	
+[ssm 28705a23-3924-46a3-93f8-7d703a77adf3 | estado Success | codigo 0]

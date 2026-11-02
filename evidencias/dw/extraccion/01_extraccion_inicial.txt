@@ -1,0 +1,16 @@
+batch_id=ext_01_inicial lote planificado modo=inicial base_seq=0
+batch_id=ext_01_inicial entidad extraida entidad=mysql.customers filas=54 solape=0 bytes=7529
+batch_id=ext_01_inicial entidad extraida entidad=mysql.products filas=27 solape=0 bytes=4982
+batch_id=ext_01_inicial entidad extraida entidad=mysql.orders filas=106 solape=0 bytes=6009
+batch_id=ext_01_inicial entidad extraida entidad=mysql.order_items filas=259 solape=0 bytes=6819
+batch_id=ext_01_inicial entidad extraida entidad=documentdb.reviews filas=158 solape=0 bytes=19594
+batch_id=ext_01_inicial entidad extraida entidad=documentdb.navigation_events filas=508 solape=0 bytes=48212
+batch_id=ext_01_inicial lote confirmado seq=1 modo=inicial filas=1112
+  mysql.customers                filas=  54 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/mysql/customers/batch_id=ext_01_inicial/part-00000.parquet
+  mysql.products                 filas=  27 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/mysql/products/batch_id=ext_01_inicial/part-00000.parquet
+  mysql.orders                   filas= 106 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/mysql/orders/batch_id=ext_01_inicial/part-00000.parquet
+  mysql.order_items              filas= 259 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/mysql/order_items/batch_id=ext_01_inicial/part-00000.parquet
+  documentdb.reviews             filas= 158 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/documentdb/reviews/batch_id=ext_01_inicial/part-00000.parquet
+  documentdb.navigation_events   filas= 508 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/documentdb/navigation_events/batch_id=ext_01_inicial/part-00000.parquet
+	
+[ssm 22ac5387-e81f-4344-ae93-8a385f72a384 | estado Success | codigo 0]

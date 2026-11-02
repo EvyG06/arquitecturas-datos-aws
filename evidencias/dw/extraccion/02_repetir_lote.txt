@@ -1,0 +1,9 @@
+batch_id=ext_01_inicial ya extraido, no se consultan las fuentes seq=1 filas=1112
+  mysql.customers                filas=  54 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/mysql/customers/batch_id=ext_01_inicial/part-00000.parquet
+  mysql.products                 filas=  27 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/mysql/products/batch_id=ext_01_inicial/part-00000.parquet
+  mysql.orders                   filas= 106 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/mysql/orders/batch_id=ext_01_inicial/part-00000.parquet
+  mysql.order_items              filas= 259 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/mysql/order_items/batch_id=ext_01_inicial/part-00000.parquet
+  documentdb.reviews             filas= 158 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/documentdb/reviews/batch_id=ext_01_inicial/part-00000.parquet
+  documentdb.navigation_events   filas= 508 solape=  0  s3://eve-dw-726168540074-us-east-2/raw/documentdb/navigation_events/batch_id=ext_01_inicial/part-00000.parquet
+	failed to run commands: exit status 99
+[ssm 6fc8b15b-34ac-4545-9aff-7a7b840e3933 | estado Failed | codigo 99]

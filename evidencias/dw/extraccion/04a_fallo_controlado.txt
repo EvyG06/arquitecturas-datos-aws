@@ -1,0 +1,24 @@
+batch_id=ext_03_fallo_y_reintento_negocio3 lote planificado modo=incremental base_seq=2
+batch_id=ext_03_fallo_y_reintento_negocio3 entidad extraida entidad=mysql.customers filas=0 solape=0 bytes=2068
+batch_id=ext_03_fallo_y_reintento_negocio3 entidad extraida entidad=mysql.products filas=0 solape=0 bytes=1917
+batch_id=ext_03_fallo_y_reintento_negocio3 entidad extraida entidad=mysql.orders filas=6 solape=3 bytes=3639
+batch_id=ext_03_fallo_y_reintento_negocio3 entidad extraida entidad=mysql.order_items filas=6 solape=3 bytes=3506
+	Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/opt/dw/src/ecommerce_dw/extraction/extract.py", line 288, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/opt/dw/src/ecommerce_dw/extraction/extract.py", line 281, in main
+    result = extractor.run(batch_id, args.mode)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/dw/src/ecommerce_dw/extraction/extract.py", line 131, in run
+    record = self._extract(batch_id, mode, state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/dw/src/ecommerce_dw/extraction/extract.py", line 177, in _extract
+    fault_point("extraccion_a_mitad", f"lote {batch_id} despues de {source}")
+  File "/opt/dw/src/ecommerce_dw/extraction/extract.py", line 55, in fault_point
+    raise ControlledFault(f"fallo controlado en {name} {context}".strip())
+ControlledFault: fallo controlado en extraccion_a_mitad lote ext_03_fallo_y_reintento_negocio3 despues de mysql
+failed to run commands: exit status 1
+[ssm 013c8f8f-1afd-48cd-935c-78101773ef2a | estado Failed | codigo 1]

@@ -1,0 +1,11 @@
+# Fase 4a, pasos 9 y 11: columna CDC y usuarios de solo lectura
+customers    _cdc_ts agregada
+products     _cdc_ts agregada
+orders       _cdc_ts agregada
+order_items  _cdc_ts agregada
+[ssm d5482cae-f019-4dea-b453-56e84cf50eab | estado Success | codigo 0]
+MySQL etl_lector:
+  GRANT USAGE ON *.* TO `etl_lector`@`%`
+  GRANT SELECT ON `ecommerce`.* TO `etl_lector`@`%`
+DocumentDB etl_lector: [{'db': 'ecommerce', 'role': 'read'}]
+[ssm 1b970d30-0c32-4d82-a172-edbe1ed8f766 | estado Success | codigo 0]

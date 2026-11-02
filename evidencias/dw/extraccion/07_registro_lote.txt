@@ -1,0 +1,75 @@
+{
+  "batch_id": "ext_02_incremental_negocio2",
+  "modo": "incremental",
+  "seq": 2,
+  "planificado_utc": "2026-11-02T21:43:38.436920+00:00",
+  "extraido_utc": "2026-11-02T21:43:40.029698+00:00",
+  "solape_segundos": 300,
+  "entidades": {
+    "mysql.customers": {
+      "entidad": "mysql.customers",
+      "filas": 0,
+      "repetidas_por_solape": 0,
+      "bytes": 2068,
+      "s3": "s3://eve-dw-726168540074-us-east-2/raw/mysql/customers/batch_id=ext_02_incremental_negocio2/part-00000.parquet",
+      "desde": "2026-11-02T21:38:07.261093+00:00",
+      "hasta": "2026-11-02T21:43:38.432430+00:00"
+    },
+    "mysql.products": {
+      "entidad": "mysql.products",
+      "filas": 0,
+      "repetidas_por_solape": 0,
+      "bytes": 1917,
+      "s3": "s3://eve-dw-726168540074-us-east-2/raw/mysql/products/batch_id=ext_02_incremental_negocio2/part-00000.parquet",
+      "desde": "2026-11-02T21:38:07.261093+00:00",
+      "hasta": "2026-11-02T21:43:38.432430+00:00"
+    },
+    "mysql.orders": {
+      "entidad": "mysql.orders",
+      "filas": 3,
+      "repetidas_por_solape": 0,
+      "bytes": 3556,
+      "s3": "s3://eve-dw-726168540074-us-east-2/raw/mysql/orders/batch_id=ext_02_incremental_negocio2/part-00000.parquet",
+      "desde": "2026-11-02T21:38:07.261093+00:00",
+      "hasta": "2026-11-02T21:43:38.432430+00:00"
+    },
+    "mysql.order_items": {
+      "entidad": "mysql.order_items",
+      "filas": 3,
+      "repetidas_por_solape": 0,
+      "bytes": 3430,
+      "s3": "s3://eve-dw-726168540074-us-east-2/raw/mysql/order_items/batch_id=ext_02_incremental_negocio2/part-00000.parquet",
+      "desde": "2026-11-02T21:38:07.261093+00:00",
+      "hasta": "2026-11-02T21:43:38.432430+00:00"
+    },
+    "documentdb.reviews": {
+      "entidad": "documentdb.reviews",
+      "filas": 3,
+      "repetidas_por_solape": 0,
+      "bytes": 5861,
+      "s3": "s3://eve-dw-726168540074-us-east-2/raw/documentdb/reviews/batch_id=ext_02_incremental_negocio2/part-00000.parquet",
+      "desde": "2026-11-02T21:38:07.264904+00:00",
+      "hasta": "2026-11-02T21:43:38.436801+00:00"
+    },
+    "documentdb.navigation_events": {
+      "entidad": "documentdb.navigation_events",
+      "filas": 3,
+      "repetidas_por_solape": 0,
+      "bytes": 6245,
+      "s3": "s3://eve-dw-726168540074-us-east-2/raw/documentdb/navigation_events/batch_id=ext_02_incremental_negocio2/part-00000.parquet",
+      "desde": "2026-11-02T21:38:07.264904+00:00",
+      "hasta": "2026-11-02T21:43:38.436801+00:00"
+    }
+  },
+  "total_filas": 12
+}{
+  "entries": [
+    {
+      "url": "s3://eve-dw-726168540074-us-east-2/raw/mysql/orders/batch_id=ext_02_incremental_negocio2/part-00000.parquet",
+      "mandatory": true,
+      "meta": {
+        "content_length": 3556
+      }
+    }
+  ]
+}
