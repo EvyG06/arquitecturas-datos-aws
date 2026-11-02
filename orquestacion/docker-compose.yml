@@ -25,9 +25,12 @@ x-airflow-common: &airflow-common
     AWS_REGION: ${AWS_REGION:-us-east-2}
     AWS_DEFAULT_REGION: ${AWS_REGION:-us-east-2}
     DL_BUCKET: ${DL_BUCKET:?falta orquestacion/.env}
+    DW_AWS: "1"
+    RDS_CA_BUNDLE: /opt/certs/rds-global-bundle.pem
   volumes:
     - ./dags:/opt/airflow/dags:ro
     - ../data-lake:/opt/dl:ro
+    - ../data-warehouse:/opt/dw:ro
     - ./aws:/opt/airflow/aws:ro
     - airflow_logs:/opt/airflow/logs
   depends_on: &airflow-depends

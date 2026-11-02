@@ -1,4 +1,5 @@
 # El contexto de build es la raiz del repo, pero la imagen solo necesita los requirements.
-# Todo lo demas (codigo, DAGs, SQL) se monta en tiempo de ejecucion.
+# Todo lo demas (codigo, DAGs, SQL, dbt) se monta en tiempo de ejecucion.
 *
 !data-lake/requirements.txt
+!data-warehouse/requirements-aws.txt

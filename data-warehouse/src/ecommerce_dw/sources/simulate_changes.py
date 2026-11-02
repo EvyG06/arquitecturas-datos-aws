@@ -7,6 +7,8 @@ from datetime import datetime
 
 import pymysql
 
+from ecommerce_dw import aws_conn
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -23,7 +25,7 @@ def main():
     )
     args = parser.parse_args()
 
-    connection = pymysql.connect(
+    connection = aws_conn.mysql_connect(autocommit=False) if aws_conn.enabled() else pymysql.connect(
         host=os.getenv("MYSQL_HOST", "localhost"),
         port=int(os.getenv("MYSQL_PORT", "3306")),
         user=os.environ["MYSQL_USER"],

@@ -13,6 +13,8 @@ from datetime import datetime, timedelta
 from faker import Faker
 from pymongo import MongoClient
 
+from ecommerce_dw import aws_conn
+
 from ecommerce_dw.sources.generate_data import (
     build_review_text,
     connect_mysql,
@@ -113,7 +115,7 @@ def build_mongo_documents(batch_id, business_day, customers, products, fake, rng
 
 def write_mongo_documents(reviews, events):
     """Reemplaza por _id los documentos del lote, así repetirlo no duplica."""
-    client = MongoClient(os.environ["MONGODB_URI"])
+    client = aws_conn.mongo_client() if aws_conn.enabled() else MongoClient(os.environ["MONGODB_URI"])
     try:
         db = client[os.getenv("MONGO_DATABASE", "ecommerce")]
         ensure_mongo_collections(db)

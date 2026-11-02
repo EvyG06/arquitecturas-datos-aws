@@ -15,6 +15,8 @@ from faker import Faker
 from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 
+from ecommerce_dw import aws_conn
+
 DEPARTMENTS = [
     ("Bogotá, D.C.", "Bogotá"),
     ("Antioquia", "Medellín"),
@@ -84,9 +86,10 @@ EVENT_VALIDATOR = {
             "event_type": {"bsonType": "string", "enum": ["vista_producto", "busqueda", "agregar_carrito"]},
             "occurred_at": {"bsonType": "date"},
             "session": {"bsonType": "object", "required": ["id"], "properties": {"id": {"bsonType": "string"}}},
-            "customer": {"bsonType": ["object", "null"]},
+            # anyOf en lugar de bsonType con lista de tipos: es la forma documentada que acepta DocumentDB.
+            "customer": {"anyOf": [{"bsonType": "object"}, {"bsonType": "null"}]},
             "page": {"bsonType": "object", "required": ["type", "path"], "properties": {"type": {"bsonType": "string"}, "path": {"bsonType": "string"}}},
-            "product": {"bsonType": ["object", "null"]},
+            "product": {"anyOf": [{"bsonType": "object"}, {"bsonType": "null"}]},
             "device": {"bsonType": "object", "required": ["type", "sales_channel"], "properties": {"type": {"bsonType": "string"}, "sales_channel": {"bsonType": "string", "enum": SALES_CHANNELS}}},
         },
     }
@@ -110,6 +113,8 @@ def parse_args():
 
 
 def connect_mysql():
+    if aws_conn.enabled():
+        return aws_conn.mysql_connect(autocommit=False)
     return pymysql.connect(
         host=os.getenv("MYSQL_HOST", "localhost"),
         port=int(os.getenv("MYSQL_PORT", "3306")),
@@ -416,7 +421,7 @@ def build_bad_records(args, start):
 
 
 def load_mongo(args, rng, fake, customers, products, start, bad):
-    client = MongoClient(os.environ["MONGODB_URI"])
+    client = aws_conn.mongo_client() if aws_conn.enabled() else MongoClient(os.environ["MONGODB_URI"])
     try:
         db = client[os.getenv("MONGO_DATABASE", "ecommerce")]
         ensure_mongo_collections(db)
