@@ -12,5 +12,10 @@ case "$MODULE" in
   sources.*) PROFILE=fuentes ;;   # sistema de origen simulado, con credenciales maestras
   *) PROFILE=pipeline ;;           # extraccion y carga, solo con usuarios de lectura
 esac
-exec docker compose exec -T -e AWS_PROFILE="$PROFILE" -e PYTHONPATH=/opt/dw/src -e PYTHONDONTWRITEBYTECODE=1 airflow-scheduler \
+# Solo estas dos variables opcionales pasan al contenedor: el fallo controlado y el solape de la ventana CDC.
+EXTRA=()
+if [ -n "${DW_FAULT:-}" ]; then EXTRA+=(-e "DW_FAULT=$DW_FAULT"); fi
+if [ -n "${DW_CDC_SOLAPE_SEGUNDOS:-}" ]; then EXTRA+=(-e "DW_CDC_SOLAPE_SEGUNDOS=$DW_CDC_SOLAPE_SEGUNDOS"); fi
+exec docker compose exec -T -e AWS_PROFILE="$PROFILE" -e PYTHONPATH=/opt/dw/src -e PYTHONDONTWRITEBYTECODE=1 \
+  ${EXTRA[@]+"${EXTRA[@]}"} airflow-scheduler \
   /home/airflow/dw-venv/bin/python -m "ecommerce_dw.$MODULE" "$@"

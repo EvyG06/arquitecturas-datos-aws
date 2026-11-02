@@ -27,6 +27,8 @@ ENV
 else
   echo ".env ya existe, se conservan los secretos"
 fi
+# Variables agregadas despues de la primera instalacion: se anaden sin tocar los secretos existentes.
+grep -q '^DW_BUCKET=' .env || echo "DW_BUCKET=eve-dw-${ACCOUNT_ID}-${REGION}" >> .env
 
 # Los contenedores asumen un rol de trabajo encadenando desde el rol de la instancia.
 # pipeline: extraccion, carga y transformacion. fuentes: el sistema de origen simulado del DW.

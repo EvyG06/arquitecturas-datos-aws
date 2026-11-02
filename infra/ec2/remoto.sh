@@ -36,4 +36,6 @@ aws ssm get-command-invocation --command-id "$ID" --instance-id "$AIRFLOW_INSTAN
 CODE=$(aws ssm get-command-invocation --command-id "$ID" --instance-id "$AIRFLOW_INSTANCE" \
   --query ResponseCode --output text)
 echo "[ssm $ID | estado $STATUS | codigo $CODE]"
-[ "$STATUS" = "Success" ]
+# Devuelve el codigo real del comando remoto, asi quien llama puede distinguir un 99 (omitido) de un error.
+[ "$STATUS" = "Success" ] && exit 0
+case "$CODE" in ''|*[!0-9]*|0) exit 1 ;; *) exit "$CODE" ;; esac
