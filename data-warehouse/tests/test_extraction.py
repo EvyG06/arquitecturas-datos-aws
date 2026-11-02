@@ -267,3 +267,22 @@ def test_documentdb_ventana_y_aplanado():
     rows = list(DocumentDBReader._rows(Db(), ENTITIES[4], None, T0))
     assert rows[0]["customer_id"] == 7 and rows[0]["product_id"] is None and rows[0]["_cdc_ts"] == T0
     assert '"review_id": 1' in rows[0]["document_json"]
+
+
+def test_etapas_del_dag_fuentes_por_separado_y_confirmacion(world):
+    ex, mysql, docdb = world
+    assert ex.extract_source("lote1", "auto", "documentdb")["resultado"] == "extraido"
+    with pytest.raises(RuntimeError, match="faltan entidades: mysql.customers"):
+        ex.confirm("lote1")  # sin MySQL el lote no se puede confirmar
+    assert s3util.read_json(ex.s3, BUCKET, STATE_KEY) is None
+    assert ex.extract_source("lote1", "auto", "mysql")["resultado"] == "extraido"
+    record = ex.confirm("lote1")
+    assert record["resultado"] == "extraido" and record["seq"] == 1 and record["total_filas"] == 8
+    assert ex.extract_source("lote1", "auto", "mysql")["resultado"] == "ya_extraido"
+    assert ex.confirm("lote1")["resultado"] == "ya_extraido"
+
+
+def test_confirmar_sin_plan_falla_claro(world):
+    ex, _, _ = world
+    with pytest.raises(RuntimeError, match="no tiene plan"):
+        ex.confirm("lote_sin_extraer")

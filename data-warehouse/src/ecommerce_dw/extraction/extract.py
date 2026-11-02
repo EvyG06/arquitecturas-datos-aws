@@ -119,16 +119,50 @@ class Extractor:
         return any(h["batch_id"] == batch_id for h in state["historial"])
 
     # ---------- flujo ----------
-    def run(self, batch_id: str, mode: str = "auto") -> dict:
+    def _status(self, batch_id: str) -> tuple[dict, dict | None]:
         if not BATCH_ID.match(batch_id):
             raise ValueError(f"batch_id invalido: {batch_id!r}. Solo letras, digitos, punto, guion y guion bajo")
         state, _ = self.state()
-        record = s3util.read_json(self.s3, self.bucket, f"{batch_prefix(batch_id)}/batch.json")
+        return state, s3util.read_json(self.s3, self.bucket, f"{batch_prefix(batch_id)}/batch.json")
+
+    def run(self, batch_id: str, mode: str = "auto") -> dict:
+        """Lote completo: todas las fuentes y la confirmacion. Es lo que corre la terminal."""
+        for source in SOURCES:
+            if self.extract_source(batch_id, mode, source)["resultado"] == "ya_extraido":
+                record = s3util.read_json(self.s3, self.bucket, f"{batch_prefix(batch_id)}/batch.json")
+                return {**record, "resultado": "ya_extraido"}
+        return self.confirm(batch_id)
+
+    def extract_source(self, batch_id: str, mode: str, source: str) -> dict:
+        """Etapa de extraccion de una fuente. En el DAG cada fuente es una tarea y corren en paralelo."""
+        state, record = self._status(batch_id)
         if record and self.committed(state, batch_id):
-            log(batch_id, "ya extraido, no se consultan las fuentes", seq=record["seq"], filas=record["total_filas"])
+            log(batch_id, "ya extraido, no se consultan las fuentes", fuente=source, seq=record["seq"])
+            return {"resultado": "ya_extraido"}
+        if record:  # el registro ya existe: todas las entidades estaban completas, solo falta confirmar
+            return {"resultado": "extraido"}
+        plan = self._plan(batch_id, mode, state)
+        if state["seq"] != plan["base_seq"]:
+            raise StaleBatch(self._stale_msg(batch_id, plan["base_seq"], state["seq"]))
+        pending = [e for e in by_source(source) if not self._entity_done(batch_id, e)]
+        if pending:
+            with self.readers[source].snapshot() as fetch:
+                for entity in pending:
+                    self._extract_entity(fetch, entity, batch_id, plan)
+        else:
+            log(batch_id, "la fuente ya estaba extraida en un intento anterior, no se vuelve a leer", fuente=source)
+        if source == SOURCES[0]:
+            fault_point("extraccion_a_mitad", f"lote {batch_id} despues de {source}")
+        return {"resultado": "extraido"}
+
+    def confirm(self, batch_id: str) -> dict:
+        """Etapa de registro en S3: manifiestos COPY, batch.json y por ultimo la marca de agua."""
+        state, record = self._status(batch_id)
+        if record and self.committed(state, batch_id):
+            log(batch_id, "ya extraido y confirmado", seq=record["seq"], filas=record["total_filas"])
             return {**record, "resultado": "ya_extraido"}
         if record is None:
-            record = self._extract(batch_id, mode, state)
+            record = self._record(batch_id)
         else:
             log(batch_id, "registro del lote existe pero sin confirmar, se confirma")
         self._commit(batch_id, record)
@@ -162,21 +196,15 @@ class Extractor:
         log(batch_id, "lote planificado", modo=plan["modo"], base_seq=plan["base_seq"])
         return plan
 
-    def _extract(self, batch_id: str, mode: str, state: dict) -> dict:
-        plan = self._plan(batch_id, mode, state)
-        if state["seq"] != plan["base_seq"]:
-            raise StaleBatch(self._stale_msg(batch_id, plan["base_seq"], state["seq"]))
-        summaries = {}
-        for n, source in enumerate(SOURCES):
-            pending = [e for e in by_source(source) if not self._entity_done(batch_id, e)]
-            if pending:
-                with self.readers[source].snapshot() as fetch:
-                    for entity in pending:
-                        self._extract_entity(fetch, entity, batch_id, plan)
-            if n == 0:
-                fault_point("extraccion_a_mitad", f"lote {batch_id} despues de {source}")
+    def _record(self, batch_id: str) -> dict:
+        plan = s3util.read_json(self.s3, self.bucket, f"{batch_prefix(batch_id)}/plan.json")
+        if plan is None:
+            raise RuntimeError(f"El lote {batch_id} no tiene plan: corre primero la extraccion de sus fuentes")
+        summaries = {entity.id: self._entity_done(batch_id, entity) for entity in ENTITIES}
+        missing = sorted(eid for eid, summary in summaries.items() if summary is None)
+        if missing:
+            raise RuntimeError(f"El lote {batch_id} no se puede confirmar, faltan entidades: {', '.join(missing)}")
         for entity in ENTITIES:
-            summaries[entity.id] = self._entity_done(batch_id, entity)
             self._write_manifest(entity, batch_id, summaries[entity.id])
         record = {
             "batch_id": batch_id, "modo": plan["modo"], "seq": plan["base_seq"] + 1,
@@ -262,6 +290,9 @@ def main(argv=None) -> int:
     parser.add_argument("--batch-id", help="Identificador del lote. Si se omite se genera manual_<UTC>.")
     parser.add_argument("--mode", choices=("auto", "inicial", "incremental"), default="auto")
     parser.add_argument("--estado", action="store_true", help="Muestra las marcas de agua y el historial")
+    stage = parser.add_mutually_exclusive_group()
+    stage.add_argument("--fuente", choices=SOURCES, help="Solo extrae esta fuente, sin confirmar el lote (DAG)")
+    stage.add_argument("--confirmar", action="store_true", help="Solo registra y confirma el lote ya extraido (DAG)")
     args = parser.parse_args(argv)
 
     import boto3
@@ -278,7 +309,10 @@ def main(argv=None) -> int:
         print_state(extractor)
         return 0
     batch_id = args.batch_id or f"manual_{datetime.now(UTC):%Y%m%dT%H%M%SZ}"
-    result = extractor.run(batch_id, args.mode)
+    if args.fuente:
+        result = extractor.extract_source(batch_id, args.mode, args.fuente)
+        return EXIT_YA_EXTRAIDO if result["resultado"] == "ya_extraido" else 0
+    result = extractor.confirm(batch_id) if args.confirmar else extractor.run(batch_id, args.mode)
     for entity_id, s in result["entidades"].items():
         print(f"  {entity_id:30} filas={s['filas']:>4} solape={s['repetidas_por_solape']:>3}  {s['s3']}")
     return EXIT_YA_EXTRAIDO if result["resultado"] == "ya_extraido" else 0
