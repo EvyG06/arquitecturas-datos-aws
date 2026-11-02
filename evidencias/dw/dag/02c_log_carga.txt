@@ -1,0 +1,14 @@
+== attempt=1.log
+[2026-11-02T23:34:50.000+0000] {subprocess.py:88} INFO - Running command: ['/usr/bin/bash', '-c', 'echo "batch_id=$LOTE tarea=cargar_redshift intento=$INTENTO${REPROCESAR:+ modo=reproceso}"\nif [ -n "$REPROCESAR" ]; then\n  exec /home/airfl
+[2026-11-02T23:34:50.016+0000] {subprocess.py:106} INFO - batch_id=manual__fallo_carga_20261102T232745Z tarea=cargar_redshift intento=1
+[2026-11-02T23:34:58.340+0000] {subprocess.py:106} INFO - ecommerce_dw.loading.redshift.RedshiftError: FAILED en 800a5689-3842-4b8b-8baa-b76aa685ebaa: Query #8 failed with ERROR: division by zero
+[2026-11-02T23:34:58.340+0000] {subprocess.py:106} INFO -   sentencia que fallo: select 1 / 0 as fallo_controlado_carga_a_mitad
+[2026-11-02T23:34:58.340+0000] {subprocess.py:106} INFO -   error: ERROR: division by zero
+[2026-11-02T23:34:58.511+0000] {taskinstance.py:1242} INFO - Marking task as UP_FOR_RETRY. dag_id=dw_ecommerce, task_id=cargar_redshift, run_id=manual__fallo_carga_20261102T232745Z, execution_date=20261102T233431, start_date=20261102T233449
+== attempt=2.log
+[2026-11-02T23:36:07.019+0000] {subprocess.py:88} INFO - Running command: ['/usr/bin/bash', '-c', 'echo "batch_id=$LOTE tarea=cargar_redshift intento=$INTENTO${REPROCESAR:+ modo=reproceso}"\nif [ -n "$REPROCESAR" ]; then\n  exec /home/airfl
+[2026-11-02T23:36:07.035+0000] {subprocess.py:106} INFO - batch_id=manual__fallo_carga_20261102T232745Z tarea=cargar_redshift intento=2
+[2026-11-02T23:36:20.082+0000] {subprocess.py:106} INFO - batch_id=manual__fallo_carga_20261102T232745Z lote cargado en raw seq=8 filas=24
+[2026-11-02T23:36:22.286+0000] {taskinstance.py:361} INFO - Marking task as SUCCESS. dag_id=dw_ecommerce, task_id=cargar_redshift, run_id=manual__fallo_carga_20261102T232745Z, execution_date=20261102T233431, start_date=20261102T233606, end_
+	
+[ssm ecad083f-d2a3-40b7-b9cd-cf0aed33fdc6 | estado Success | codigo 0]

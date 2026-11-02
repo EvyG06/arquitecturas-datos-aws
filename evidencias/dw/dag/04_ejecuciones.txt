@@ -1,0 +1,6 @@
+run_id                                               tipo       estado   inicio (UTC)         conf
+scheduled__2026-11-01T11:00:00+00:00                 scheduled  success  2026-11-02 23:29:01  
+manual__fallo_carga_20261102T232745Z                 manual     success  2026-11-02 23:34:32  {'fallo_controlado': 'carga_a_mitad'}
+manual__reproceso_20261102T232745Z                   manual     success  2026-11-02 23:39:50  {'reprocesar_batch_id': 'manual__fallo_carga_20261102T232745Z'}
+	
+[ssm c8ebbb42-e83e-4422-8c9e-b4d53ef30314 | estado Success | codigo 0]

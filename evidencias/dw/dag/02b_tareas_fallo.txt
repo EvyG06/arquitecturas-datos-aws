@@ -1,0 +1,17 @@
+manual__fallo_carga_20261102T232745Z | manual | success | conf {'fallo_controlado': 'carga_a_mitad'}
+tarea                    estado           intentos  segundos
+validar_configuracion    success                 1         3
+extraer_documentdb       success                 1         6
+extraer_mysql            success                 1         6
+registrar_lote_s3        success                 1         2
+cargar_redshift          success                 2        16
+dbt_seed                 success                 1        12
+dbt_run_intermediate     success                 1        49
+dbt_run_quarantine       success                 1        17
+dbt_snapshot             success                 1        13
+dbt_run_marts            success                 1        22
+dbt_test                 success                 1        34
+validar_conciliacion     success                 1         6
+registrar_resultado      success                 1         1
+	
+[ssm edd2ed04-8c90-4dcc-857f-ec929be333e4 | estado Success | codigo 0]

@@ -1,0 +1,10 @@
+
+## huella
+tabla                  filas  llaves  total o vigentes
+dim_customer           51     50      50.00           
+dim_product            26     25      25.00           
+fct_navigation_events  512    512                     
+fct_reviews            162    162     511.00          
+fct_sales              265    265     7547670.90      
+	
+[ssm 1a459744-6e32-4939-9341-eef036b80b5e | estado Success | codigo 0]

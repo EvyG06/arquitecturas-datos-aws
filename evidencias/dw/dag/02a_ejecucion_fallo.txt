@@ -1,0 +1,5 @@
+23:34:43 manual__fallo_carga_20261102T232745Z: running
+23:36:57 manual__fallo_carga_20261102T232745Z: running
+23:39:16 manual__fallo_carga_20261102T232745Z: success
+	
+[ssm 1e9deee4-4b6f-491b-90fd-f60e6b271e56 | estado Success | codigo 0]

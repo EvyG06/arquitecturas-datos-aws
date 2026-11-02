@@ -1,0 +1,17 @@
+manual__reproceso_20261102T232745Z | manual | success | conf {'reprocesar_batch_id': 'manual__fallo_carga_20261102T232745Z'}
+tarea                    estado           intentos  segundos
+validar_configuracion    success                 1         3
+extraer_mysql            skipped                 1         1
+extraer_documentdb       skipped                 1         1
+registrar_lote_s3        skipped                 1         1
+cargar_redshift          success                 1        17
+dbt_seed                 success                 1        12
+dbt_run_intermediate     success                 1        51
+dbt_run_quarantine       success                 1        16
+dbt_snapshot             success                 1        15
+dbt_run_marts            success                 1        23
+dbt_test                 success                 1        35
+validar_conciliacion     success                 1         6
+registrar_resultado      success                 1         1
+	
+[ssm 59a835ee-33dc-4f0f-835f-0b930277dc49 | estado Success | codigo 0]

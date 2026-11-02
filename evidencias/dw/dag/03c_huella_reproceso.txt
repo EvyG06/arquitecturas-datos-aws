@@ -1,0 +1,14 @@
+
+## huella
+tabla                  filas  llaves  total o vigentes
+dim_customer           51     50      50.00           
+dim_product            26     25      25.00           
+fct_navigation_events  518    518                     
+fct_reviews            168    168     531.00          
+fct_sales              271    271     7674611.22      
+	
+[ssm f09250f3-3360-4440-9108-4ef9f398ca11 | estado Success | codigo 0]
+fct_sales: 271 -> 271 (esperado +0)
+fct_reviews: 168 -> 168 (esperado +0)
+fct_navigation_events: 518 -> 518 (esperado +0)
+OK: cada hecho crecio exactamente 0 filas

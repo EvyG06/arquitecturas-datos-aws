@@ -1,0 +1,36 @@
+2026-11-02 18:39:06        977 _control/pipeline/batch_id=manual__fallo_carga_20261102T232745Z/manual__fallo_carga_20261102T232745Z.json
+2026-11-02 18:43:04        967 _control/pipeline/batch_id=manual__fallo_carga_20261102T232745Z/manual__reproceso_20261102T232745Z.json
+2026-11-02 18:33:32        966 _control/pipeline/batch_id=scheduled__2026-11-01T11_00_00_00_00/scheduled__2026-11-01T11_00_00_00_00.json
+{
+  "dag_run_id": "manual__fallo_carga_20261102T232745Z",
+  "lote": "manual__fallo_carga_20261102T232745Z",
+  "modo": "normal",
+  "fallo_controlado": "carga_a_mitad",
+  "resultado": "completa",
+  "tareas_fallidas": [],
+  "estado_tareas": {
+    "dbt_snapshot": "success",
+    "cargar_redshift": "success",
+    "dbt_seed": "success",
+    "dbt_run_intermediate": "success",
+    "dbt_run_quarantine": "success",
+    "dbt_run_marts": "success",
+    "dbt_test": "success",
+    "validar_conciliacion": "success",
+    "validar_configuracion": "success",
+    "extraer_documentdb": "success",
+    "extraer_mysql": "success",
+    "registrar_lote_s3": "success"
+  },
+  "seq_lote": 8,
+  "filas_extraidas": {
+    "mysql.customers": 0,
+    "mysql.products": 0,
+    "mysql.orders": 6,
+    "mysql.order_items": 6,
+    "documentdb.reviews": 6,
+    "documentdb.navigation_events": 6
+  },
+  "inicio_utc": "2026-11-02 23:34:32.401245+00:00",
+  "registrado_utc": "2026-11-02 23:39:05.528783+00:00"
+}
