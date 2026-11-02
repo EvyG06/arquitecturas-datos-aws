@@ -157,3 +157,50 @@ def test_copia_controlada_fuente_caida_y_fallo_controlado(env, fake_nlp, monkeyp
     assert set(keys(s3, "silver/")) == written
     assert state(s3)["processed_runs"]["r2"]["procesamientos"] == 1
     assert len(keys(s3, "_control/silver/run_id=r2/")) == 1
+
+
+def test_etapas_separadas_con_fallo_y_reintento(env, fake_nlp, monkeypatch):
+    from dl.config import ControlledFault
+    s3, feeds = env
+    feeds["https://p.test"] = feed(item(1000001, "Ana en Lima"))
+    feeds["https://m.test"] = feed(item(1000002, "Eva en Roma"))
+    ingest.ingest_all(SOURCES, "r1", s3=s3)
+    silver.process_run("r1", s3=s3, nlp=fake_nlp)
+    feeds["https://p.test"] = feed(item(1000001, "Ana en Lima"), item(1000003, "Luis en Quito"))
+    ingest.ingest_all(SOURCES, "r2", s3=s3)
+
+    plan = silver.stage_prepare("r2", s3=s3)
+    assert plan["stage"] == "preparado" and (plan["nuevas"], plan["repetidas"]) == (1, 2)
+    assert state(s3)["processed_runs"].keys() == {"r1"}
+    plan = silver.stage_enrich("r2", s3=s3, nlp=fake_nlp)
+    assert plan["nlp"]["textos_enviados"] == 1
+
+    monkeypatch.setenv("DL_FAULT", "silver_antes_de_publicar")
+    with pytest.raises(ControlledFault):
+        silver.stage_publish("r2", s3=s3)
+    assert "r2" not in state(s3)["processed_runs"]
+    monkeypatch.delenv("DL_FAULT")
+    report = silver.stage_publish("r2", s3=s3)
+    assert report["nuevas"] == 1 and report["noticias_vigentes_total"] == 3
+    assert silver.stage_publish("r2", s3=s3)["stage"] == "publicado"
+    assert state(s3)["processed_runs"]["r2"]["procesamientos"] == 1
+    assert silver.stage_prepare("r2", s3=s3)["stage"] == "omitido"
+
+
+def test_publicar_rechaza_plan_sobre_estado_cambiado(env, fake_nlp):
+    from dl.s3util import ConcurrentUpdate
+    s3, feeds = env
+    feeds["https://p.test"] = feed(item(1000001, "Ana en Lima"))
+    feeds["https://m.test"] = feed(item(1000002, "Eva en Roma"))
+    ingest.ingest_all(SOURCES, "r1", s3=s3)
+    silver.process_run("r1", s3=s3, nlp=fake_nlp)
+    feeds["https://p.test"] = feed(item(1000003, "Luis en Quito"))
+    ingest.ingest_all(SOURCES, "r2", s3=s3)
+    feeds["https://p.test"] = feed(item(1000004, "Sara en Cali"))
+    ingest.ingest_all(SOURCES, "r3", s3=s3)
+
+    silver.stage_prepare("r2", s3=s3)
+    silver.stage_enrich("r2", s3=s3, nlp=fake_nlp)
+    silver.process_run("r3", s3=s3, nlp=fake_nlp)
+    with pytest.raises(ConcurrentUpdate):
+        silver.stage_publish("r2", s3=s3)

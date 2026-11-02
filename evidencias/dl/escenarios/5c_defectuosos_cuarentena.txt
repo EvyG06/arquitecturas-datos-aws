@@ -1,0 +1,12 @@
+== 5c. Registros defectuosos, cuarentena con trazabilidad a Bronze ==
+2026-11-02 12:56:12 -05  (17:56:12 UTC)  cuenta 726168540074  region us-east-2
+
+quarantine/silver/run_id=prueba__controlada_20261101T163714Z/rechazos.jsonl: 3 registros
+
+motivo           fuente             lote_bronze                          posicion  titulo_crudo                                   fecha_cruda                enlace_crudo                                 
+---------------  -----------------  -----------------------------------  --------  ---------------------------------------------  -------------------------  ---------------------------------------------
+titulo_vacio     eltiempo_politica  prueba__controlada_20261101T163714Z  12                                                       2026-11-01T08:54:58-05:00  https://www.eltiempo.com/politica/gobierno/mi
+fecha_invalida   eltiempo_politica  prueba__controlada_20261101T163714Z  13        MinDefensa revela 41 presuntos casos de corru  ayer en la tarde           https://www.eltiempo.com/politica/gobierno/mi
+enlace_invalido  eltiempo_politica  prueba__controlada_20261101T163714Z  14        MinDefensa revela 41 presuntos casos de corru  2026-11-01T08:54:58-05:00  https://noticias-ajenas.example/politica/nota
+
+Archivo original en Bronze: s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_politica/ingestion_date=2026-11-02/run_id=prueba__controlada_20261101T163714Z/feed.xml

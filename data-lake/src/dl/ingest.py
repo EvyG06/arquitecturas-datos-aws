@@ -156,12 +156,18 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--run-id")
     p.add_argument("--config", type=Path, default=DEFAULT_SOURCES)
     p.add_argument("--attempt", type=int, default=1, help="numero de intento, Airflow pasa try_number")
+    p.add_argument("--max-attempts", type=int, help="en el ultimo intento se acepta un lote parcial")
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     logging.getLogger("botocore").setLevel(logging.WARNING)
+    logging.getLogger("numexpr").setLevel(logging.WARNING)
     run_id = safe_run_id(args.run_id or "manual__" + utc_now().strftime("%Y%m%dT%H%M%SZ"))
     summary = ingest_all(load_sources(args.config), run_id, attempt=args.attempt)
     print(json.dumps(summary, ensure_ascii=False, indent=2))
+    if summary["status"] == "partial" and args.max_attempts and args.attempt >= args.max_attempts:
+        log.warning("task=ingest run_id=%s lote parcial aceptado en el ultimo intento (%s de %s), "
+                    "las fuentes caidas quedan registradas como error", run_id, args.attempt, args.max_attempts)
+        return 0
     return {"complete": 0, "partial": 2, "failed": 1}[summary["status"]]
 
 

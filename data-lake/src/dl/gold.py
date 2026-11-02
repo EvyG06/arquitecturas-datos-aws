@@ -157,6 +157,7 @@ def main(argv: list[str] | None = None) -> int:
     argparse.ArgumentParser(description="Silver a Gold").parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     logging.getLogger("botocore").setLevel(logging.WARNING)
+    logging.getLogger("numexpr").setLevel(logging.WARNING)
     try:
         report = build()
     except ConcurrentUpdate as err:

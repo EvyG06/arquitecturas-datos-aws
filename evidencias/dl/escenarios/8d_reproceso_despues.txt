@@ -1,0 +1,18 @@
+== 8d. Reprocesamiento desde Bronze, mismo resultado ==
+2026-11-02 13:00:58 -05  (18:00:58 UTC)  cuenta 726168540074  region us-east-2
+
+Estado publicado despues del reproceso, debe coincidir con 8a
+
+== SELECT (SELECT count(*) FROM silver_news) AS noticias, (SELECT count(DISTINCT news_id) FROM silver_news) AS di
+noticias  distintas  con_cambios  entidades  frases  gold_noticias
+--------  ---------  -----------  ---------  ------  -------------
+85        85         2            281        1052    85           
+[1 filas | 1,441 bytes escaneados | 1771 ms | 5efbabef-e207-4da5-b960-dfc521bf8ed4]
+tabla                    en_glue                                         faltan_en_glue  ubicacion_desactualizada
+-----------------------  ----------------------------------------------  --------------  ------------------------
+silver_news              2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               -                       
+silver_news_entities     2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               -                       
+silver_news_key_phrases  2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               -                       
+gold_news_daily          2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               -                       
+gold_entity_daily        2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               -                       
+gold_key_phrase_daily    2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               -                       

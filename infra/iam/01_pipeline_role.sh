@@ -8,14 +8,19 @@ ROLE=arq-datos-pipeline
 ME=$(aws sts get-caller-identity --query Arn --output text)
 [[ "$ME" == *":user/"* ]] || { echo "Corre esto como usuario admin, no como $ME"; exit 1; }
 
+# Confia en tu usuario (desarrollo local) y, si ya existe, en el rol de la instancia de Airflow.
+# No confia en el servicio EC2 en general: ninguna otra instancia de la cuenta puede asumirlo.
+EC2_ROLE=arq-datos-ec2
+EC2_STMT=""
+if aws iam get-role --role-name "$EC2_ROLE" >/dev/null 2>&1; then
+  EC2_STMT=",{\"Sid\": \"InstanciaAirflow\", \"Effect\": \"Allow\", \"Principal\": {\"AWS\": \"arn:aws:iam::${ACCOUNT_ID}:role/${EC2_ROLE}\"}, \"Action\": \"sts:AssumeRole\"}"
+fi
 TRUST=$(cat <<JSON
 {
   "Version": "2012-10-17",
   "Statement": [
-    {"Sid": "InstanciaEC2", "Effect": "Allow",
-     "Principal": {"Service": "ec2.amazonaws.com"}, "Action": "sts:AssumeRole"},
     {"Sid": "DesarrolloLocal", "Effect": "Allow",
-     "Principal": {"AWS": "${ME}"}, "Action": "sts:AssumeRole"}
+     "Principal": {"AWS": "${ME}"}, "Action": "sts:AssumeRole"}${EC2_STMT}
   ]
 }
 JSON

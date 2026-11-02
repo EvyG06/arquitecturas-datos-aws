@@ -1,0 +1,19 @@
+== 3c. Nueva particion, disponible en Athena ==
+2026-11-02 12:54:06 -05  (17:54:06 UTC)  cuenta 726168540074  region us-east-2
+
+tabla                    en_glue                             faltan_en_glue  ubicacion_desactualizada
+-----------------------  ----------------------------------  --------------  ------------------------
+silver_news              2026-10-30, 2026-10-31, 2026-11-01  -               -                       
+silver_news_entities     2026-10-30, 2026-10-31, 2026-11-01  -               -                       
+silver_news_key_phrases  2026-10-30, 2026-10-31, 2026-11-01  -               -                       
+gold_news_daily          2026-10-30, 2026-10-31, 2026-11-01  -               -                       
+gold_entity_daily        2026-10-30, 2026-10-31, 2026-11-01  -               -                       
+gold_key_phrase_daily    2026-10-30, 2026-10-31, 2026-11-01  -               -                       
+
+== SELECT seccion, count(*) AS noticias FROM silver_news WHERE pub_date = DATE '2026-11-01' GROUP BY seccion ORDE
+seccion   noticias
+--------  --------
+Economía  9       
+Mundo     7       
+Política  6       
+[3 filas | 112 bytes escaneados | 518 ms | f9d6c0d6-7e14-4733-922a-e123ff22423d]

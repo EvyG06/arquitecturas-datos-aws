@@ -1,0 +1,18 @@
+== 3a. Nueva particion 2026-11-01, antes de actualizar los metadatos ==
+2026-11-02 12:53:32 -05  (17:53:32 UTC)  cuenta 726168540074  region us-east-2
+
+Particiones del manifiesto que Glue todavia no conoce
+tabla                    en_glue                 faltan_en_glue  ubicacion_desactualizada
+-----------------------  ----------------------  --------------  ------------------------
+silver_news              2026-10-30, 2026-10-31  2026-11-01      2026-10-31              
+silver_news_entities     2026-10-30, 2026-10-31  2026-11-01      2026-10-31              
+silver_news_key_phrases  2026-10-30, 2026-10-31  2026-11-01      2026-10-31              
+gold_news_daily          2026-10-30, 2026-10-31  2026-11-01      2026-10-31              
+gold_entity_daily        2026-10-30, 2026-10-31  2026-11-01      2026-10-31              
+gold_key_phrase_daily    2026-10-30, 2026-10-31  2026-11-01      2026-10-31              
+
+== SELECT count(*) AS noticias FROM silver_news WHERE pub_date = DATE '2026-11-01'
+noticias
+--------
+0       
+[1 filas | 0 bytes escaneados | 503 ms | 5fba7e40-a6a1-4465-b7b8-b9fbddbf68f5]

@@ -88,6 +88,7 @@ def main(argv: list[str] | None = None) -> int:
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     logging.getLogger("botocore").setLevel(logging.WARNING)
+    logging.getLogger("numexpr").setLevel(logging.WARNING)
     sources = {s.source_id: s for s in load_sources()}
     if args.source not in sources:
         p.error(f"fuente desconocida {args.source}")

@@ -1,0 +1,10 @@
+== 4b. Repeticion de un lote exitoso, Silver ==
+2026-11-02 12:54:35 -05  (17:54:35 UTC)  cuenta 726168540074  region us-east-2
+
+Lotes pendientes en Bronze
+2026-11-02 12:54:37,626 INFO dl.silver task=silver no hay lotes pendientes
+
+Reproceso forzado del mismo lote manual__inc_20261101T163714Z
+2026-11-02 12:54:40,444 INFO numexpr.utils NumExpr defaulting to 8 threads.
+2026-11-02 12:54:41,092 INFO dl.silver task=silver run_id=manual__inc_20261101T163714Z aplicado build=b20261101T011531Z-11aee4 nuevas=0 repetidas=30 actualizadas=0 obsoletas=0 rechazados=0 particiones=[] comprehend_textos=0 cache_hits=0
+2026-11-02 12:54:41,524 INFO dl.silver task=silver run_id=manual__inc_20261101T163714Z publicado build=b20261101T011531Z-11aee4

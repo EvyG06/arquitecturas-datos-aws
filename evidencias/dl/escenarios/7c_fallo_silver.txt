@@ -1,0 +1,29 @@
+== 7c. Fallo controlado en Silver antes de publicar ==
+2026-11-02 12:57:19 -05  (17:57:19 UTC)  cuenta 726168540074  region us-east-2
+
+2026-11-02 12:57:22,708 INFO numexpr.utils NumExpr defaulting to 8 threads.
+2026-11-02 12:57:38,453 INFO dl.silver task=silver run_id=manual__fallo_20261101T163714Z aplicado build=b20261101T011531Z-11aee4 nuevas=30 repetidas=0 actualizadas=0 obsoletas=0 rechazados=0 particiones=['2026-11-01', '2026-11-02'] comprehend_textos=30 cache_hits=22
+2026-11-02 12:57:38,454 ERROR dl.silver task=silver fallo controlado en silver_antes_de_publicar run_id=manual__fallo_20261101T163714Z, no se publico nada
+exit=1
+
+Lote manual__fallo_20261101T163714Z
+
+Bronze  estado=complete
+fuente             status  http_status  item_count  s3_uri                                                                                                        
+-----------------  ------  -----------  ----------  --------------------------------------------------------------------------------------------------------------
+eltiempo_economia  ok      200          10          s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_economia/ingestion_date=2026-11-02/run_id=manual__fa
+eltiempo_mundo     ok      200          10          s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_mundo/ingestion_date=2026-11-02/run_id=manual__fallo
+eltiempo_politica  ok      200          10          s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_politica/ingestion_date=2026-11-02/run_id=manual__fa
+
+Silver  build vigente=b20261101T011531Z-11aee4
+  el lote NO esta publicado en el estado vigente de Silver
+
+Reportes de procesamiento guardados: 0
+
+Archivos escritos que ningun manifiesto referencia, invisibles para Athena
+2026-11-02 12:57:31      35746 silver/news/pub_date=2026-11-01/v=b20261101T011531Z-11aee4-manual__fallo_20261101T163714Z/part-00000.parquet
+2026-11-02 12:57:38      24946 silver/news/pub_date=2026-11-02/v=b20261101T011531Z-11aee4-manual__fallo_20261101T163714Z/part-00000.parquet
+2026-11-02 12:57:32       7777 silver/news_entities/pub_date=2026-11-01/v=b20261101T011531Z-11aee4-manual__fallo_20261101T163714Z/part-00000.parquet
+2026-11-02 12:57:39       5357 silver/news_entities/pub_date=2026-11-02/v=b20261101T011531Z-11aee4-manual__fallo_20261101T163714Z/part-00000.parquet
+2026-11-02 12:57:32      17238 silver/news_key_phrases/pub_date=2026-11-01/v=b20261101T011531Z-11aee4-manual__fallo_20261101T163714Z/part-00000.parquet
+2026-11-02 12:57:39      10619 silver/news_key_phrases/pub_date=2026-11-02/v=b20261101T011531Z-11aee4-manual__fallo_20261101T163714Z/part-00000.parquet

@@ -1,0 +1,38 @@
+== 7e. Fallo controlado, resultados sin perdida ni duplicacion ==
+2026-11-02 12:59:02 -05  (17:59:02 UTC)  cuenta 726168540074  region us-east-2
+
+2026-11-02 12:59:04,841 INFO numexpr.utils NumExpr defaulting to 8 threads.
+2026-11-02 12:59:07,523 INFO dl.gold task=gold recalculadas=['2026-11-01', '2026-11-02'] eliminadas=[] sin_cambios=2
+2026-11-02 12:59:10,237 INFO dl.catalog task=catalog tabla=silver_news crear=1 actualizar=1 eliminar=0
+2026-11-02 12:59:11,390 INFO dl.catalog task=catalog tabla=silver_news_entities crear=1 actualizar=1 eliminar=0
+2026-11-02 12:59:12,398 INFO dl.catalog task=catalog tabla=silver_news_key_phrases crear=1 actualizar=1 eliminar=0
+2026-11-02 12:59:13,355 INFO dl.catalog task=catalog tabla=gold_news_daily crear=1 actualizar=1 eliminar=0
+2026-11-02 12:59:14,379 INFO dl.catalog task=catalog tabla=gold_entity_daily crear=1 actualizar=1 eliminar=0
+2026-11-02 12:59:15,421 INFO dl.catalog task=catalog tabla=gold_key_phrase_daily crear=1 actualizar=1 eliminar=0
+
+== 05_conciliacion_gold_vs_silver.sql
+pub_date    seccion   silver  gold  estado
+----------  --------  ------  ----  ------
+2026-10-30  Economía  4       4     OK    
+2026-10-30  Política  5       5     OK    
+2026-10-31  Economía  7       7     OK    
+2026-10-31  Mundo     11      11    OK    
+2026-10-31  Política  6       6     OK    
+2026-11-01  Economía  10      10    OK    
+2026-11-01  Mundo     11      11    OK    
+2026-11-01  Política  13      13    OK    
+2026-11-02  Economía  9       9     OK    
+2026-11-02  Mundo     6       6     OK    
+2026-11-02  Política  3       3     OK    
+[11 filas | 1,979 bytes escaneados | 873 ms | 22404150-2bdf-4cf8-b3fc-f0d76f20ae9d]
+
+== 06_validaciones_calidad.sql
+validacion                                fallas
+----------------------------------------  ------
+news_id duplicado en vigentes             0     
+enlace fuera de eltiempo.com o sin https  0     
+campos obligatorios vacios                0     
+entidades sin noticia vigente             0     
+fecha de publicacion fuera de rango       0     
+frases clave sin noticia vigente          0     
+[6 filas | 37,937 bytes escaneados | 1135 ms | 8bc3355f-a6ce-4e52-bdf6-e240435ca3ab]

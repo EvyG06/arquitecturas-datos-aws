@@ -1,0 +1,28 @@
+== 2b. Nuevo lote incremental, Silver solo agrega lo nuevo ==
+2026-11-02 12:53:10 -05  (17:53:10 UTC)  cuenta 726168540074  region us-east-2
+
+2026-11-02 12:53:11,767 INFO dl.silver task=silver run_id=manual__inc_20261101T163714Z ya procesado, se omite
+{
+  "primero": {
+    "processed_at_utc": "2026-11-01T16:39:18+00:00",
+    "build_id": "b20261101T011531Z-11aee4",
+    "nuevas": 25,
+    "repetidas": 4,
+    "actualizadas": 1,
+    "obsoletas": 0,
+    "rechazados": 0,
+    "textos_enviados_comprehend": 26
+  },
+  "ultimo": {
+    "processed_at_utc": "2026-11-01T16:39:18+00:00",
+    "build_id": "b20261101T011531Z-11aee4",
+    "nuevas": 25,
+    "repetidas": 4,
+    "actualizadas": 1,
+    "obsoletas": 0,
+    "rechazados": 0,
+    "textos_enviados_comprehend": 26
+  },
+  "procesamientos": 1,
+  "skipped": true
+}

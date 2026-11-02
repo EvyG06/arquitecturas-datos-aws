@@ -1,7 +1,18 @@
 # Funciones compartidas por los scripts de evidencias. Se carga con source desde la raiz del repo.
-: "${DL_BUCKET:?Abre la terminal con arq antes de correr este script}"
-: "${ACCOUNT_ID:?Abre la terminal con arq antes de correr este script}"
-: "${PYTHONPATH:?Abre la terminal con arq antes de correr este script}"
+
+# Si la terminal no se abrio con arq, carga las variables del proyecto por su cuenta.
+if [ -z "${DL_BUCKET:-}" ] || [ -z "${PYTHONPATH:-}" ]; then
+  source infra/env.sh
+fi
+: "${DL_BUCKET:?No se pudo cargar infra/env.sh}"
+: "${ACCOUNT_ID:?No se pudo obtener la cuenta, revisa las credenciales del perfil admin}"
+
+# El entorno conda no se puede activar desde un script, solo verificar que este activo.
+if ! python -c "import boto3, pyarrow, defusedxml" 2>/dev/null; then
+  echo "El python activo ($(command -v python)) no tiene las dependencias del proyecto."
+  echo "Corre primero  conda activate arq-aws  (o el alias arq) y vuelve a intentar."
+  exit 1
+fi
 export AWS_PAGER=""
 mkdir -p "$OUT"
 ONLY="${1:-}"

@@ -157,7 +157,7 @@ def cmd_versiones(s3, b, args) -> None:
     news = [n for n in _dataset(s3, b, state, "news") if n["version"] > 1]
     print(f"Noticias vigentes con version > 1: {len(news)}\n")
     print(table(news, ["news_id", "version", "first_seen_run_id", "content_run_id", "nlp_status",
-                       "nlp_analyzed_at_utc", "title"], width=70))
+                       "nlp_analyzed_at_utc", "title"], width=130))
 
 
 def cmd_particiones(s3, b, args) -> None:

@@ -1,0 +1,9 @@
+== 6a. Noticia con contenido modificado, version vigente ==
+2026-11-02 12:56:21 -05  (17:56:21 UTC)  cuenta 726168540074  region us-east-2
+
+Noticias vigentes con version > 1: 2
+
+news_id  version  first_seen_run_id             content_run_id                       nlp_status  nlp_analyzed_at_utc  title                                                                 
+-------  -------  ----------------------------  -----------------------------------  ----------  -------------------  ----------------------------------------------------------------------
+3597596  2        manual__primera               manual__inc_20261101T163714Z         analizado   2026-11-01 16:38:38  Venezuela después del regreso de María Corina Machado: la disputa entr
+3597819  2        manual__inc_20261101T163714Z  prueba__controlada_20261101T163714Z  analizado   2026-11-02 17:55:57  Presidente Abelardo De La Espriella condenó atentado en Algeciras, Hui

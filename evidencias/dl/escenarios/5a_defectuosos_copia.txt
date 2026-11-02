@@ -1,0 +1,46 @@
+== 5a. Registros defectuosos, copia controlada del RSS ==
+2026-11-02 12:55:25 -05  (17:55:25 UTC)  cuenta 726168540074  region us-east-2
+
+2026-11-02 12:55:28,023 INFO dl.ingest task=ingest source=eltiempo_politica run_id=prueba__controlada_20261101T163714Z status=ok items=14 sha256=c7a9658baba7
+{
+  "derivado_de": "s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_politica/ingestion_date=2026-11-01/run_id=manual__inc_20261101T163714Z/feed.xml",
+  "cambios": {
+    "modificada": {
+      "link": "https://www.eltiempo.com/politica/abelardo-de-la-espriella/presidente-abelardo-de-la-espriella-condeno-atentado-en-algeciras-huila-no-vamos-a-retroceder-ante-el-terrorismo-3597819",
+      "titulo_antes": "Presidente Abelardo De La Espriella condenó atentado en Algeciras, Huila: 'No vamos a retroceder ante el terrorismo'",
+      "titulo_despues": "Presidente Abelardo De La Espriella condenó atentado en Algeciras, Huila: 'No vamos a retroceder ante el terrorismo' [actualizacion controlada EIA]"
+    },
+    "duplicada": "https://www.eltiempo.com/politica/gobierno/mindefensa-revela-41-presuntos-casos-de-corrupcion-que-salpican-al-gobierno-de-gustavo-petro-podrian-representar-una-afectacion-patrimonial-3597800",
+    "defectuosos": [
+      {
+        "motivo_esperado": "titulo_vacio",
+        "title": ""
+      },
+      {
+        "motivo_esperado": "fecha_invalida",
+        "pubDate": "ayer en la tarde"
+      },
+      {
+        "motivo_esperado": "enlace_invalido",
+        "link": "https://noticias-ajenas.example/politica/nota-9999999",
+        "guid": "https://noticias-ajenas.example/politica/nota-9999999"
+      }
+    ],
+    "items_originales": 10,
+    "items_copia": 14
+  },
+  "ingesta": {
+    "run_id": "prueba__controlada_20261101T163714Z",
+    "run_ts_utc": "2026-11-02T17:55:26.928+00:00",
+    "finished_at_utc": "2026-11-02T17:55:28.023+00:00",
+    "status": "complete",
+    "sources": {
+      "eltiempo_politica": {
+        "status": "ok",
+        "http_status": 200,
+        "item_count": 14,
+        "s3_uri": "s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_politica/ingestion_date=2026-11-02/run_id=prueba__controlada_20261101T163714Z/feed.xml"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+== 8a. Reprocesamiento desde Bronze, estado antes ==
+2026-11-02 12:59:31 -05  (17:59:31 UTC)  cuenta 726168540074  region us-east-2
+
+Estado publicado antes del reproceso
+
+== SELECT (SELECT count(*) FROM silver_news) AS noticias, (SELECT count(DISTINCT news_id) FROM silver_news) AS di
+noticias  distintas  con_cambios  entidades  frases  gold_noticias
+--------  ---------  -----------  ---------  ------  -------------
+85        85         2            281        1052    85           
+[1 filas | 1,450 bytes escaneados | 1513 ms | e70057cc-6fb1-4111-a712-9454d666ea31]

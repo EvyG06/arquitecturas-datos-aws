@@ -1,0 +1,18 @@
+== 6b. Noticia con contenido modificado, publicada en Athena ==
+2026-11-02 12:56:32 -05  (17:56:32 UTC)  cuenta 726168540074  region us-east-2
+
+2026-11-02 12:56:34,714 INFO numexpr.utils NumExpr defaulting to 8 threads.
+2026-11-02 12:56:36,308 INFO dl.gold task=gold recalculadas=['2026-11-01'] eliminadas=[] sin_cambios=2
+2026-11-02 12:56:38,771 INFO dl.catalog task=catalog tabla=silver_news crear=0 actualizar=1 eliminar=0
+2026-11-02 12:56:39,745 INFO dl.catalog task=catalog tabla=silver_news_entities crear=0 actualizar=1 eliminar=0
+2026-11-02 12:56:40,742 INFO dl.catalog task=catalog tabla=silver_news_key_phrases crear=0 actualizar=1 eliminar=0
+2026-11-02 12:56:41,577 INFO dl.catalog task=catalog tabla=gold_news_daily crear=0 actualizar=1 eliminar=0
+2026-11-02 12:56:42,474 INFO dl.catalog task=catalog tabla=gold_entity_daily crear=0 actualizar=1 eliminar=0
+2026-11-02 12:56:43,396 INFO dl.catalog task=catalog tabla=gold_key_phrase_daily crear=0 actualizar=1 eliminar=0
+
+== SELECT news_id, version, first_seen_run_id, content_run_id, nlp_status, title FROM silver_news WHERE version >
+news_id  version  first_seen_run_id             content_run_id                       nlp_status  title                                                                                                                                               
+-------  -------  ----------------------------  -----------------------------------  ----------  ----------------------------------------------------------------------------------------------------------------------------------------------------
+3597596  2        manual__primera               manual__inc_20261101T163714Z         analizado   Venezuela después del regreso de María Corina Machado: la disputa entre oposición y chavismo por el poder y los tiempos de la transición democrática
+3597819  2        manual__inc_20261101T163714Z  prueba__controlada_20261101T163714Z  analizado   Presidente Abelardo De La Espriella condenó atentado en Algeciras, Huila: 'No vamos a retroceder ante el terrorismo' [actualizacion controlada EIA] 
+[2 filas | 3,642 bytes escaneados | 569 ms | 6bead44a-90b6-49ba-82fc-f1d4252d4e53]

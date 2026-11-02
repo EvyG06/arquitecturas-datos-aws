@@ -1,0 +1,33 @@
+== 7a. Fallo controlado, fuente caida ==
+2026-11-02 12:56:53 -05  (17:56:53 UTC)  cuenta 726168540074  region us-east-2
+
+2026-11-02 12:56:56,440 INFO dl.ingest task=ingest source=eltiempo_politica run_id=manual__fallo_20261101T163714Z status=ok items=10 sha256=f356dcad865e
+2026-11-02 12:56:57,544 INFO dl.ingest task=ingest source=eltiempo_economia run_id=manual__fallo_20261101T163714Z status=ok items=10 sha256=faa51f983a05
+2026-11-02 12:56:58,416 ERROR dl.ingest task=ingest source=eltiempo_mundo run_id=manual__fallo_20261101T163714Z status=http_error code=404
+{
+  "run_id": "manual__fallo_20261101T163714Z",
+  "run_ts_utc": "2026-11-02T17:56:54.292+00:00",
+  "finished_at_utc": "2026-11-02T17:56:58.416+00:00",
+  "status": "partial",
+  "sources": {
+    "eltiempo_politica": {
+      "status": "ok",
+      "http_status": 200,
+      "item_count": 10,
+      "s3_uri": "s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_politica/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/feed.xml"
+    },
+    "eltiempo_economia": {
+      "status": "ok",
+      "http_status": 200,
+      "item_count": 10,
+      "s3_uri": "s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_economia/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/feed.xml"
+    },
+    "eltiempo_mundo": {
+      "status": "http_error",
+      "http_status": 404,
+      "item_count": null,
+      "s3_uri": null
+    }
+  }
+}
+exit=2

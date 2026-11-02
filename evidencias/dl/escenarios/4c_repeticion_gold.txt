@@ -1,0 +1,13 @@
+== 4c. Repeticion de un lote exitoso, Gold y catalogo ==
+2026-11-02 12:54:52 -05  (17:54:52 UTC)  cuenta 726168540074  region us-east-2
+
+Gold
+2026-11-02 12:54:54,069 INFO dl.gold task=gold recalculadas=[] eliminadas=[] sin_cambios=3
+
+Glue Data Catalog
+2026-11-02 12:54:56,497 INFO dl.catalog task=catalog tabla=silver_news crear=0 actualizar=0 eliminar=0
+2026-11-02 12:54:57,279 INFO dl.catalog task=catalog tabla=silver_news_entities crear=0 actualizar=0 eliminar=0
+2026-11-02 12:54:57,970 INFO dl.catalog task=catalog tabla=silver_news_key_phrases crear=0 actualizar=0 eliminar=0
+2026-11-02 12:54:58,787 INFO dl.catalog task=catalog tabla=gold_news_daily crear=0 actualizar=0 eliminar=0
+2026-11-02 12:54:59,694 INFO dl.catalog task=catalog tabla=gold_entity_daily crear=0 actualizar=0 eliminar=0
+2026-11-02 12:55:00,453 INFO dl.catalog task=catalog tabla=gold_key_phrase_daily crear=0 actualizar=0 eliminar=0

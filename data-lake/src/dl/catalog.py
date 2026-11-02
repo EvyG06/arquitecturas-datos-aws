@@ -132,6 +132,7 @@ def main(argv: list[str] | None = None) -> int:
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     logging.getLogger("botocore").setLevel(logging.WARNING)
+    logging.getLogger("numexpr").setLevel(logging.WARNING)
     glue = boto3.client("glue")
     if args.setup:
         setup(glue, bucket())

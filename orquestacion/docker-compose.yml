@@ -1,0 +1,105 @@
+# Airflow con LocalExecutor para los DAGs del proyecto. Se levanta en la EC2 con setup_ec2.sh.
+# Ningun puerto queda expuesto a la red: la interfaz web solo escucha en 127.0.0.1 de la instancia
+# y se abre desde el Mac con port forwarding de Session Manager.
+name: arq-datos
+
+x-airflow-common: &airflow-common
+  image: arq-datos/airflow:2.11.2
+  build:
+    context: ..
+    dockerfile: orquestacion/Dockerfile
+  user: "${AIRFLOW_UID:-50000}:0"
+  environment: &airflow-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:${POSTGRES_PASSWORD:?falta orquestacion/.env}@postgres/airflow
+    AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY:?falta orquestacion/.env}
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY:?falta orquestacion/.env}
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__CORE__PARALLELISM: "4"
+    AIRFLOW__WEBSERVER__WORKERS: "2"
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "false"
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+    AWS_CONFIG_FILE: /opt/airflow/aws/config
+    AWS_PROFILE: pipeline
+    AWS_REGION: ${AWS_REGION:-us-east-2}
+    AWS_DEFAULT_REGION: ${AWS_REGION:-us-east-2}
+    DL_BUCKET: ${DL_BUCKET:?falta orquestacion/.env}
+  volumes:
+    - ./dags:/opt/airflow/dags:ro
+    - ../data-lake:/opt/dl:ro
+    - ./aws:/opt/airflow/aws:ro
+    - airflow_logs:/opt/airflow/logs
+  depends_on: &airflow-depends
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?falta orquestacion/.env}
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow -d airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        set -e
+        airflow db migrate
+        if ! airflow users list -o json | grep -q '"username": "admin"'; then
+          airflow users create --username admin --password "$$AIRFLOW_ADMIN_PASSWORD" \
+            --firstname Eve --lastname Admin --role Admin --email admin@example.org
+        fi
+        airflow pools set dl_escritura 1 "Escrituras al data lake, una a la vez"
+    environment:
+      <<: *airflow-env
+      AIRFLOW_ADMIN_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD:?falta orquestacion/.env}
+    restart: "no"
+
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    depends_on:
+      <<: *airflow-depends
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    depends_on:
+      <<: *airflow-depends
+      airflow-init:
+        condition: service_completed_successfully
+
+volumes:
+  postgres_data:
+  airflow_logs:

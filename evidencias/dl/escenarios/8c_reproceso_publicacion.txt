@@ -1,0 +1,11 @@
+== 8c. Reprocesamiento desde Bronze, publicacion ==
+2026-11-02 13:00:32 -05  (18:00:32 UTC)  cuenta 726168540074  region us-east-2
+
+2026-11-02 13:00:34,791 INFO numexpr.utils NumExpr defaulting to 8 threads.
+2026-11-02 13:00:39,383 INFO dl.gold task=gold recalculadas=['2026-10-30', '2026-10-31', '2026-11-01', '2026-11-02'] eliminadas=[] sin_cambios=0
+2026-11-02 13:00:42,445 INFO dl.catalog task=catalog tabla=silver_news crear=0 actualizar=4 eliminar=0
+2026-11-02 13:00:43,756 INFO dl.catalog task=catalog tabla=silver_news_entities crear=0 actualizar=4 eliminar=0
+2026-11-02 13:00:45,135 INFO dl.catalog task=catalog tabla=silver_news_key_phrases crear=0 actualizar=4 eliminar=0
+2026-11-02 13:00:46,460 INFO dl.catalog task=catalog tabla=gold_news_daily crear=0 actualizar=4 eliminar=0
+2026-11-02 13:00:48,009 INFO dl.catalog task=catalog tabla=gold_entity_daily crear=0 actualizar=4 eliminar=0
+2026-11-02 13:00:49,447 INFO dl.catalog task=catalog tabla=gold_key_phrase_daily crear=0 actualizar=4 eliminar=0

@@ -1,0 +1,20 @@
+== 8b. Reprocesamiento desde Bronze sin consultar los RSS ==
+2026-11-02 12:59:44 -05  (17:59:44 UTC)  cuenta 726168540074  region us-east-2
+
+2026-11-02 12:59:49,528 INFO numexpr.utils NumExpr defaulting to 8 threads.
+2026-11-02 12:59:54,239 INFO dl.silver task=silver run_id=manual__primera aplicado build=b20261102T175946Z-df39bd nuevas=30 repetidas=0 actualizadas=0 obsoletas=0 rechazados=0 particiones=['2026-10-30', '2026-10-31'] comprehend_textos=0 cache_hits=30
+2026-11-02 12:59:55,079 INFO dl.silver task=silver run_id=prueba__fuente_rota aplicado build=b20261102T175946Z-df39bd nuevas=0 repetidas=10 actualizadas=0 obsoletas=0 rechazados=0 particiones=[] comprehend_textos=0 cache_hits=0
+2026-11-02 13:00:03,619 INFO dl.silver task=silver run_id=manual__inc_20261101T163714Z aplicado build=b20261102T175946Z-df39bd nuevas=25 repetidas=4 actualizadas=1 obsoletas=0 rechazados=0 particiones=['2026-10-31', '2026-11-01'] comprehend_textos=0 cache_hits=46
+2026-11-02 13:00:07,828 INFO dl.silver task=silver run_id=prueba__controlada_20261101T163714Z aplicado build=b20261102T175946Z-df39bd nuevas=0 repetidas=9 actualizadas=1 obsoletas=0 rechazados=3 particiones=['2026-11-01'] comprehend_textos=0 cache_hits=22
+2026-11-02 13:00:16,863 INFO dl.silver task=silver run_id=manual__fallo_20261101T163714Z aplicado build=b20261102T175946Z-df39bd nuevas=30 repetidas=0 actualizadas=0 obsoletas=0 rechazados=0 particiones=['2026-11-01', '2026-11-02'] comprehend_textos=0 cache_hits=52
+2026-11-02 13:00:18,166 INFO dl.silver task=silver rebuild build=b20261102T175946Z-df39bd lotes=5 vigentes=85
+
+Athena sigue leyendo la version anterior completa hasta actualizar el catalogo
+tabla                    en_glue                                         faltan_en_glue  ubicacion_desactualizada                      
+-----------------------  ----------------------------------------------  --------------  ----------------------------------------------
+silver_news              2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02
+silver_news_entities     2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02
+silver_news_key_phrases  2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02
+gold_news_daily          2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               -                                             
+gold_entity_daily        2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               -                                             
+gold_key_phrase_daily    2026-10-30, 2026-10-31, 2026-11-01, 2026-11-02  -               -                                             

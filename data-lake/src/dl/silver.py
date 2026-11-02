@@ -14,7 +14,7 @@ import boto3
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from dl.config import ControlledFault, bucket, fault_point
+from dl.config import ControlledFault, bucket, fault_point, safe_run_id
 from dl.enrich import PENDING, enrich_rows, entity_rows, key_phrase_rows
 from dl.parse import parse_feed
 from dl.s3util import ConcurrentUpdate, put_json, put_json_cas, read_json, read_json_etag
@@ -22,6 +22,7 @@ from dl.s3util import ConcurrentUpdate, put_json, put_json_cas, read_json, read_
 log = logging.getLogger("dl.silver")
 
 STATE_KEY = "_control/silver/state.json"
+STAGING = "_staging/silver"
 OK = {"ok", "ok_no_items"}
 KEEP_ON_UPDATE = ("source_id", "medio", "seccion", "first_seen_run_id")
 TS_FIELDS = ("published_at_utc", "content_ingested_at_utc", "nlp_analyzed_at_utc")
@@ -155,15 +156,22 @@ def write_partition(s3, bkt: str, key: str, rows: list[dict], schema: pa.Schema)
     s3.put_object(Bucket=bkt, Key=key, Body=buf.getvalue(), ContentType="application/vnd.apache.parquet")
 
 
+def _read_news(s3, bkt: str, key: str, day: str) -> list[dict]:
+    """Lee una particion de noticias y restaura la zona UTC, que Parquet guarda sin zona."""
+    body = s3.get_object(Bucket=bkt, Key=key)["Body"].read()
+    rows = pq.read_table(io.BytesIO(body)).to_pylist()
+    for r in rows:
+        for k in TS_FIELDS:
+            if r.get(k) is not None:
+                r[k] = r[k].replace(tzinfo=timezone.utc)
+        r["pub_date"] = date.fromisoformat(day)
+    return rows
+
+
 def load_current(s3, bkt: str, state: dict) -> dict[str, dict]:
     rows: dict[str, dict] = {}
     for day, key in state["datasets"]["news"].items():
-        body = s3.get_object(Bucket=bkt, Key=key)["Body"].read()
-        for r in pq.read_table(io.BytesIO(body)).to_pylist():
-            for k in TS_FIELDS:
-                if r.get(k) is not None:
-                    r[k] = r[k].replace(tzinfo=timezone.utc)
-            r["pub_date"] = date.fromisoformat(day)
+        for r in _read_news(s3, bkt, key, day):
             rows[r["news_id"]] = r
     return rows
 
@@ -202,9 +210,13 @@ def new_state(build: str) -> dict:
     return {"build_id": build, "datasets": {ds: {} for ds in DATASETS}, "processed_runs": {}}
 
 
-def apply_run(s3, bkt: str, state: dict, run_id: str, nlp=None) -> dict:
-    """Aplica un lote de Bronze al estado en memoria y escribe sus archivos. No confirma el estado."""
-    build = state["build_id"]
+# ---------- etapas: preparar (3), enriquecer (4) y publicar (5) ----------
+
+INTERNAL = ("plan_id", "base_etag", "force", "stage", "archivos", "dias_vacios", "dias_con_filas")
+
+
+def prepare(s3, bkt: str, state: dict, run_id: str) -> tuple[dict, dict[str, list[dict]]]:
+    """Parseo, limpieza, validacion, deduplicacion y clasificacion contra el estado vigente. No publica nada."""
     for ds in DATASETS:
         state["datasets"].setdefault(ds, {})
     run, valid, rejected, received, sources = load_batch(s3, bkt, run_id)
@@ -219,38 +231,19 @@ def apply_run(s3, bkt: str, state: dict, run_id: str, nlp=None) -> dict:
                   if any(r.get("nlp_status") is None or r.get("nlp_status") in PENDING for r in rows)}
     to_write = touched | retry_days
 
-    nlp_stats: Counter = Counter()
-    entity_count = phrase_count = 0
-    for day in sorted(to_write):
-        iso_day = day.isoformat()
-        rows = sorted(by_day.get(day, []), key=lambda r: r["news_id"])
-        if not rows:
-            for ds in DATASETS:
-                state["datasets"][ds].pop(iso_day, None)
-            continue
-        results, day_stats = enrich_rows(s3, bkt, rows, nlp)
-        nlp_stats.update(day_stats)
-        entities = [e for r in rows for e in entity_rows(r, results[r["text_hash"]])]
-        phrases = [k for r in rows for k in key_phrase_rows(r, results[r["text_hash"]])]
-        entity_count += len(entities)
-        phrase_count += len(phrases)
-        for ds, data in (("news", rows), ("news_entities", entities), ("news_key_phrases", phrases)):
-            key = f"silver/{ds}/pub_date={iso_day}/v={build}-{run_id}/part-00000.parquet"
-            write_partition(s3, bkt, key, data, SCHEMAS[ds])
-            state["datasets"][ds][iso_day] = key
-
     if rejected:
         lines = "\n".join(json.dumps(r, ensure_ascii=False) for r in rejected) + "\n"
         s3.put_object(Bucket=bkt, Key=f"quarantine/silver/run_id={run_id}/rechazos.jsonl",
                       Body=lines.encode("utf-8"), ContentType="application/x-ndjson")
 
-    processed_at = utc_now()
-    report = {
+    rows_by_day = {d.isoformat(): sorted(by_day[d], key=lambda r: r["news_id"])
+                   for d in sorted(to_write) if by_day.get(d)}
+    plan = {
+        "plan_id": uuid.uuid4().hex,
         "run_id": run_id,
-        "build_id": build,
+        "build_id": state["build_id"],
         "bronze_status": run["status"],
         "fuentes_procesadas": sources,
-        "processed_at_utc": processed_at.isoformat(timespec="seconds"),
         "items_recibidos": received,
         "validos": len(valid),
         "rechazados": len(rejected),
@@ -260,26 +253,66 @@ def apply_run(s3, bkt: str, state: dict, run_id: str, nlp=None) -> dict:
         **stats,
         "particiones_afectadas": sorted(d.isoformat() for d in touched),
         "particiones_escritas": sorted(d.isoformat() for d in to_write),
-        "nlp": dict(nlp_stats),
-        "entidades_en_particiones_escritas": entity_count,
-        "frases_en_particiones_escritas": phrase_count,
         "noticias_vigentes_total": len(current),
+        "dias_con_filas": sorted(rows_by_day),
+        "dias_vacios": sorted(d.isoformat() for d in to_write if not by_day.get(d)),
     }
-    check_invariants(report)
+    check_invariants(plan)
+    return plan, rows_by_day
 
+
+def enrich_and_write(s3, bkt: str, plan: dict, rows_by_day: dict[str, list[dict]], nlp=None) -> None:
+    """Enriquece con Comprehend (con cache) y escribe cada particion en una ruta versionada nueva."""
+    nlp_stats: Counter = Counter()
+    entity_count = phrase_count = 0
+    files: dict[str, dict[str, str]] = {ds: {} for ds in DATASETS}
+    for day in plan["dias_con_filas"]:
+        rows = rows_by_day[day]
+        results, day_stats = enrich_rows(s3, bkt, rows, nlp)
+        nlp_stats.update(day_stats)
+        entities = [e for r in rows for e in entity_rows(r, results[r["text_hash"]])]
+        phrases = [k for r in rows for k in key_phrase_rows(r, results[r["text_hash"]])]
+        entity_count += len(entities)
+        phrase_count += len(phrases)
+        for ds, data in (("news", rows), ("news_entities", entities), ("news_key_phrases", phrases)):
+            key = f"silver/{ds}/pub_date={day}/v={plan['build_id']}-{plan['run_id']}/part-00000.parquet"
+            write_partition(s3, bkt, key, data, SCHEMAS[ds])
+            files[ds][day] = key
+    plan.update(archivos=files, nlp=dict(nlp_stats), entidades_en_particiones_escritas=entity_count,
+                frases_en_particiones_escritas=phrase_count)
+
+
+def commit(state: dict, plan: dict) -> dict:
+    """Apunta el manifiesto en memoria a los archivos nuevos y registra el lote. Devuelve el reporte."""
+    for ds, days in plan["archivos"].items():
+        state["datasets"].setdefault(ds, {}).update(days)
+    for day in plan["dias_vacios"]:
+        for ds in DATASETS:
+            state["datasets"].setdefault(ds, {}).pop(day, None)
+    report = {k: v for k, v in plan.items() if k not in INTERNAL}
+    report["processed_at_utc"] = utc_now().isoformat(timespec="seconds")
     summary = {k: report[k] for k in ("processed_at_utc", "build_id", "nuevas", "repetidas",
                                       "actualizadas", "obsoletas", "rechazados")}
-    summary["textos_enviados_comprehend"] = nlp_stats.get("textos_enviados", 0)
-    entry = state["processed_runs"].get(run_id)
+    summary["textos_enviados_comprehend"] = plan["nlp"].get("textos_enviados", 0)
+    summary["plan_id"] = plan["plan_id"]
+    entry = state["processed_runs"].get(plan["run_id"])
     if entry is None or "primero" not in entry:
-        state["processed_runs"][run_id] = {"primero": summary, "ultimo": summary, "procesamientos": 1}
+        state["processed_runs"][plan["run_id"]] = {"primero": summary, "ultimo": summary, "procesamientos": 1}
     else:
         entry.update(ultimo=summary, procesamientos=entry["procesamientos"] + 1)
+    return report
 
+
+def apply_run(s3, bkt: str, state: dict, run_id: str, nlp=None) -> dict:
+    """Las tres etapas en memoria, sin confirmar el estado. La usan process_run y rebuild."""
+    plan, rows_by_day = prepare(s3, bkt, state, run_id)
+    enrich_and_write(s3, bkt, plan, rows_by_day, nlp)
+    report = commit(state, plan)
     log.info("task=silver run_id=%s aplicado build=%s nuevas=%s repetidas=%s actualizadas=%s obsoletas=%s "
-             "rechazados=%s particiones=%s comprehend_textos=%s cache_hits=%s", run_id, build,
-             stats["nuevas"], stats["repetidas"], stats["actualizadas"], stats["obsoletas"], len(rejected),
-             report["particiones_escritas"], nlp_stats.get("textos_enviados", 0), nlp_stats.get("cache_hits", 0))
+             "rechazados=%s particiones=%s comprehend_textos=%s cache_hits=%s", run_id, report["build_id"],
+             report["nuevas"], report["repetidas"], report["actualizadas"], report["obsoletas"],
+             report["rechazados"], report["particiones_escritas"], report["nlp"].get("textos_enviados", 0),
+             report["nlp"].get("cache_hits", 0))
     return report
 
 
@@ -289,7 +322,7 @@ def report_key(report: dict) -> str:
 
 
 def process_run(run_id: str, s3=None, force: bool = False, nlp=None) -> dict:
-    """Procesa un lote sobre el estado vigente y confirma con compare-and-swap."""
+    """Procesa un lote completo sobre el estado vigente y confirma con compare-and-swap."""
     s3 = s3 or boto3.client("s3")
     bkt = bucket()
     state, etag = read_json_etag(s3, bkt, STATE_KEY)
@@ -303,6 +336,89 @@ def process_run(run_id: str, s3=None, force: bool = False, nlp=None) -> dict:
     put_json_cas(s3, bkt, STATE_KEY, state, etag)
     put_json(s3, bkt, report_key(report), report)
     log.info("task=silver run_id=%s publicado build=%s", run_id, state["build_id"])
+    return report
+
+
+# ---------- etapas separadas para Airflow, con el plan guardado en S3 entre tareas ----------
+
+def plan_key(run_id: str) -> str:
+    return f"{STAGING}/run_id={run_id}/plan.json"
+
+
+def staged_key(run_id: str, day: str) -> str:
+    return f"{STAGING}/run_id={run_id}/news/pub_date={day}.parquet"
+
+
+def stage_prepare(run_id: str, s3=None, force: bool = False) -> dict:
+    s3 = s3 or boto3.client("s3")
+    bkt = bucket()
+    state, etag = read_json_etag(s3, bkt, STATE_KEY)
+    state = state or new_state(build_id())
+    if run_id in state["processed_runs"] and not force:
+        plan = {"run_id": run_id, "stage": "omitido", "motivo": "el lote ya esta publicado en Silver"}
+        put_json(s3, bkt, plan_key(run_id), plan)
+        log.info("task=silver_preparar run_id=%s ya procesado, se omite", run_id)
+        return plan
+    plan, rows_by_day = prepare(s3, bkt, state, run_id)
+    for day, rows in rows_by_day.items():
+        write_partition(s3, bkt, staged_key(run_id, day), rows, NEWS_SCHEMA)
+    plan.update(base_etag=etag, force=force, stage="preparado")
+    put_json(s3, bkt, plan_key(run_id), plan)
+    log.info("task=silver_preparar run_id=%s recibidos=%s validos=%s rechazados=%s duplicados=%s nuevas=%s "
+             "repetidas=%s actualizadas=%s obsoletas=%s particiones=%s", run_id, plan["items_recibidos"],
+             plan["validos"], plan["rechazados"], plan["duplicados_en_lote"], plan["nuevas"], plan["repetidas"],
+             plan["actualizadas"], plan["obsoletas"], plan["particiones_escritas"])
+    return plan
+
+
+def _load_plan(s3, bkt: str, run_id: str) -> dict:
+    plan = read_json(s3, bkt, plan_key(run_id))
+    if plan is None:
+        raise ValueError(f"No hay plan para el lote {run_id}, corre primero la etapa preparar")
+    return plan
+
+
+def stage_enrich(run_id: str, s3=None, nlp=None) -> dict:
+    s3 = s3 or boto3.client("s3")
+    bkt = bucket()
+    plan = _load_plan(s3, bkt, run_id)
+    if plan["stage"] in ("omitido", "publicado"):
+        log.info("task=silver_enriquecer run_id=%s etapa=%s, no hay nada que enriquecer", run_id, plan["stage"])
+        return plan
+    rows_by_day = {day: _read_news(s3, bkt, staged_key(run_id, day), day) for day in plan["dias_con_filas"]}
+    enrich_and_write(s3, bkt, plan, rows_by_day, nlp)
+    plan["stage"] = "enriquecido"
+    put_json(s3, bkt, plan_key(run_id), plan)
+    log.info("task=silver_enriquecer run_id=%s comprehend_textos=%s cache_hits=%s particiones=%s", run_id,
+             plan["nlp"].get("textos_enviados", 0), plan["nlp"].get("cache_hits", 0), plan["dias_con_filas"])
+    return plan
+
+
+def stage_publish(run_id: str, s3=None) -> dict:
+    s3 = s3 or boto3.client("s3")
+    bkt = bucket()
+    plan = _load_plan(s3, bkt, run_id)
+    if plan["stage"] == "omitido":
+        log.info("task=silver_publicar run_id=%s omitido, el lote ya estaba publicado", run_id)
+        return plan
+    state, etag = read_json_etag(s3, bkt, STATE_KEY)
+    entry = (state or {}).get("processed_runs", {}).get(run_id, {})
+    if entry.get("ultimo", {}).get("plan_id") == plan["plan_id"]:
+        log.info("task=silver_publicar run_id=%s este plan ya esta publicado, se omite", run_id)
+        return plan
+    if plan["stage"] != "enriquecido":
+        raise ValueError(f"El lote {run_id} esta en la etapa {plan['stage']}, falta enriquecer")
+    if etag != plan["base_etag"]:
+        raise ConcurrentUpdate(f"{STATE_KEY} cambio desde que se preparo {run_id}, repite desde la etapa preparar")
+    state = state or new_state(plan["build_id"])
+    report = commit(state, plan)
+    fault_point("silver_antes_de_publicar", f"run_id={run_id}")
+    put_json_cas(s3, bkt, STATE_KEY, state, etag)
+    put_json(s3, bkt, report_key(report), report)
+    plan["stage"] = "publicado"
+    put_json(s3, bkt, plan_key(run_id), plan)
+    log.info("task=silver_publicar run_id=%s publicado build=%s nuevas=%s actualizadas=%s vigentes=%s", run_id,
+             report["build_id"], report["nuevas"], report["actualizadas"], report["noticias_vigentes_total"])
     return report
 
 
@@ -346,17 +462,28 @@ def main(argv: list[str] | None = None) -> int:
     group.add_argument("--run-id")
     group.add_argument("--pending", action="store_true", help="procesa en orden los lotes sin procesar")
     group.add_argument("--rebuild", action="store_true", help="reconstruye Silver completo desde Bronze")
+    p.add_argument("--stage", choices=("preparar", "enriquecer", "publicar"),
+                   help="ejecuta una sola etapa del lote (la usa Airflow)")
     p.add_argument("--force", action="store_true", help="reprocesa aunque el lote ya este registrado")
     args = p.parse_args(argv)
+    if args.stage and not args.run_id:
+        p.error("--stage requiere --run-id")
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     logging.getLogger("botocore").setLevel(logging.WARNING)
+    logging.getLogger("numexpr").setLevel(logging.WARNING)
 
     s3 = boto3.client("s3")
     try:
         if args.rebuild:
             reports = rebuild(s3=s3)
+        elif args.stage:
+            run_id = safe_run_id(args.run_id)
+            stages = {"preparar": lambda: stage_prepare(run_id, s3=s3, force=args.force),
+                      "enriquecer": lambda: stage_enrich(run_id, s3=s3),
+                      "publicar": lambda: stage_publish(run_id, s3=s3)}
+            reports = [stages[args.stage]()]
         else:
-            run_ids = pending_runs(s3, bucket()) if args.pending else [args.run_id]
+            run_ids = pending_runs(s3, bucket()) if args.pending else [safe_run_id(args.run_id)]
             if not run_ids:
                 log.info("task=silver no hay lotes pendientes")
             reports = [process_run(r, s3=s3, force=args.force) for r in run_ids]
@@ -367,7 +494,7 @@ def main(argv: list[str] | None = None) -> int:
         log.error("task=silver %s, no se publico nada", err)
         return 1
     for r in reports:
-        print(json.dumps(r, ensure_ascii=False, indent=2))
+        print(json.dumps(r, ensure_ascii=False, indent=2, default=str))
     return 0
 
 

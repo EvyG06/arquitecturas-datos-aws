@@ -1,0 +1,33 @@
+== 4a. Repeticion de un lote exitoso, ingesta ==
+2026-11-02 12:54:24 -05  (17:54:24 UTC)  cuenta 726168540074  region us-east-2
+
+2026-11-02 12:54:26,805 INFO dl.ingest task=ingest source=eltiempo_politica run_id=manual__inc_20261101T163714Z ya ingerido, se omite
+2026-11-02 12:54:26,926 INFO dl.ingest task=ingest source=eltiempo_economia run_id=manual__inc_20261101T163714Z ya ingerido, se omite
+2026-11-02 12:54:27,078 INFO dl.ingest task=ingest source=eltiempo_mundo run_id=manual__inc_20261101T163714Z ya ingerido, se omite
+{
+  "run_id": "manual__inc_20261101T163714Z",
+  "run_ts_utc": "2026-11-01T16:37:52.577+00:00",
+  "finished_at_utc": "2026-11-02T17:54:27.079+00:00",
+  "status": "complete",
+  "sources": {
+    "eltiempo_politica": {
+      "status": "ok",
+      "http_status": 200,
+      "item_count": 10,
+      "s3_uri": "s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_politica/ingestion_date=2026-11-01/run_id=manual__inc_20261101T163714Z/feed.xml"
+    },
+    "eltiempo_economia": {
+      "status": "ok",
+      "http_status": 200,
+      "item_count": 10,
+      "s3_uri": "s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_economia/ingestion_date=2026-11-01/run_id=manual__inc_20261101T163714Z/feed.xml"
+    },
+    "eltiempo_mundo": {
+      "status": "ok",
+      "http_status": 200,
+      "item_count": 10,
+      "s3_uri": "s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_mundo/ingestion_date=2026-11-01/run_id=manual__inc_20261101T163714Z/feed.xml"
+    }
+  }
+}
+exit=0

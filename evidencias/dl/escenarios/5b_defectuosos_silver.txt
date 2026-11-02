@@ -1,0 +1,43 @@
+== 5b. Registros defectuosos y contenido modificado, procesamiento del lote ==
+2026-11-02 12:55:51 -05  (17:55:51 UTC)  cuenta 726168540074  region us-east-2
+
+2026-11-02 12:55:53,920 INFO numexpr.utils NumExpr defaulting to 8 threads.
+2026-11-02 12:55:59,415 INFO dl.silver task=silver run_id=prueba__controlada_20261101T163714Z aplicado build=b20261101T011531Z-11aee4 nuevas=0 repetidas=9 actualizadas=1 obsoletas=0 rechazados=3 particiones=['2026-11-01'] comprehend_textos=1 cache_hits=21
+2026-11-02 12:55:59,842 INFO dl.silver task=silver run_id=prueba__controlada_20261101T163714Z publicado build=b20261101T011531Z-11aee4
+{
+  "run_id": "prueba__controlada_20261101T163714Z",
+  "build_id": "b20261101T011531Z-11aee4",
+  "bronze_status": "complete",
+  "fuentes_procesadas": [
+    "eltiempo_politica"
+  ],
+  "processed_at_utc": "2026-11-02T17:55:59+00:00",
+  "items_recibidos": 14,
+  "validos": 11,
+  "rechazados": 3,
+  "rechazos_por_motivo": {
+    "titulo_vacio": 1,
+    "fecha_invalida": 1,
+    "enlace_invalido": 1
+  },
+  "duplicados_en_lote": 1,
+  "noticias_unicas_en_lote": 10,
+  "nuevas": 0,
+  "repetidas": 9,
+  "actualizadas": 1,
+  "obsoletas": 0,
+  "particiones_afectadas": [
+    "2026-11-01"
+  ],
+  "particiones_escritas": [
+    "2026-11-01"
+  ],
+  "nlp": {
+    "cache_hits": 21,
+    "textos_enviados": 1,
+    "analizado": 22
+  },
+  "entidades_en_particiones_escritas": 68,
+  "frases_en_particiones_escritas": 282,
+  "noticias_vigentes_total": 55
+}

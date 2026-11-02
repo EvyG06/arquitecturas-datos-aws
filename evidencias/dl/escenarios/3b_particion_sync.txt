@@ -1,0 +1,9 @@
+== 3b. Nueva particion, actualizacion del Glue Data Catalog ==
+2026-11-02 12:53:49 -05  (17:53:49 UTC)  cuenta 726168540074  region us-east-2
+
+2026-11-02 12:53:52,504 INFO dl.catalog task=catalog tabla=silver_news crear=1 actualizar=1 eliminar=0
+2026-11-02 12:53:53,523 INFO dl.catalog task=catalog tabla=silver_news_entities crear=1 actualizar=1 eliminar=0
+2026-11-02 12:53:54,529 INFO dl.catalog task=catalog tabla=silver_news_key_phrases crear=1 actualizar=1 eliminar=0
+2026-11-02 12:53:55,733 INFO dl.catalog task=catalog tabla=gold_news_daily crear=1 actualizar=1 eliminar=0
+2026-11-02 12:53:56,775 INFO dl.catalog task=catalog tabla=gold_entity_daily crear=1 actualizar=1 eliminar=0
+2026-11-02 12:53:57,989 INFO dl.catalog task=catalog tabla=gold_key_phrase_daily crear=1 actualizar=1 eliminar=0

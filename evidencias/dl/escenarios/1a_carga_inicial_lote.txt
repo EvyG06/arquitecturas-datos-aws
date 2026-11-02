@@ -1,0 +1,26 @@
+== 1a. Carga inicial, lote manual__primera en Bronze y Silver ==
+2026-11-02 12:52:08 -05  (17:52:08 UTC)  cuenta 726168540074  region us-east-2
+
+La carga inicial fue el lote manual__primera
+
+Lote manual__primera
+
+Bronze  estado=complete
+fuente             status  http_status  item_count  s3_uri                                                                                                        
+-----------------  ------  -----------  ----------  --------------------------------------------------------------------------------------------------------------
+eltiempo_economia  ok      200          10          s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_economia/ingestion_date=2026-10-31/run_id=manual__pr
+eltiempo_mundo     ok      200          10          s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_mundo/ingestion_date=2026-10-31/run_id=manual__prime
+eltiempo_politica  ok      200          10          s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_politica/ingestion_date=2026-10-31/run_id=manual__pr
+
+Silver  build vigente=b20261101T011531Z-11aee4
+  procesamientos=1
+registro  processed_at_utc           build_id                  nuevas  repetidas  actualizadas  obsoletas  rechazados  textos_enviados_comprehend
+--------  -------------------------  ------------------------  ------  ---------  ------------  ---------  ----------  --------------------------
+primero   2026-11-01T01:15:38+00:00  b20261101T011531Z-11aee4  30      0          0             0          0           0                         
+ultimo    2026-11-01T01:15:38+00:00  b20261101T011531Z-11aee4  30      0          0             0          0           0                         
+
+Reportes de procesamiento guardados: 4
+  _control/silver/run_id=manual__primera/b20261101T010831Z-af0fa8__20261101T010833Z.json
+  _control/silver/run_id=manual__primera/b20261101T010831Z-af0fa8__20261101T010837Z.json
+  _control/silver/run_id=manual__primera/b20261101T011515Z-a85bb4__20261101T011528Z.json
+  _control/silver/run_id=manual__primera/b20261101T011531Z-11aee4__20261101T011538Z.json

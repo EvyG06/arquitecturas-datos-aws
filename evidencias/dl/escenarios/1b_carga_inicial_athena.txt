@@ -1,0 +1,14 @@
+== 1b. Carga inicial, datos consultables en Athena ==
+2026-11-02 12:52:37 -05  (17:52:37 UTC)  cuenta 726168540074  region us-east-2
+
+
+== SELECT 'silver_news' AS tabla, count(*) AS filas, count(DISTINCT news_id) AS noticias FROM silver_news UNION A
+tabla                    filas  noticias
+-----------------------  -----  --------
+silver_news_key_phrases  362    30      
+gold_key_phrase_daily    342            
+gold_entity_daily        116            
+silver_news              30     30      
+silver_news_entities     120    29      
+gold_news_daily          5      30      
+[6 filas | 1,232 bytes escaneados | 1824 ms | 08bb1c3c-8c0f-40f5-92f1-cbcf82a401e3]

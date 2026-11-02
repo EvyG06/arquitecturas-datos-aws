@@ -1,0 +1,27 @@
+== 4d. Repeticion de un lote exitoso, sin duplicados ni doble conteo ==
+2026-11-02 12:55:10 -05  (17:55:10 UTC)  cuenta 726168540074  region us-east-2
+
+
+== 05_conciliacion_gold_vs_silver.sql
+pub_date    seccion   silver  gold  estado
+----------  --------  ------  ----  ------
+2026-10-30  Economía  4       4     OK    
+2026-10-30  Política  5       5     OK    
+2026-10-31  Economía  7       7     OK    
+2026-10-31  Mundo     11      11    OK    
+2026-10-31  Política  6       6     OK    
+2026-11-01  Economía  9       9     OK    
+2026-11-01  Mundo     7       7     OK    
+2026-11-01  Política  6       6     OK    
+[8 filas | 1,425 bytes escaneados | 955 ms | 6102611c-25bb-45d8-b83b-e40e9e49754a]
+
+== 06_validaciones_calidad.sql
+validacion                                fallas
+----------------------------------------  ------
+fecha de publicacion fuera de rango       0     
+campos obligatorios vacios                0     
+news_id duplicado en vigentes             0     
+enlace fuera de eltiempo.com o sin https  0     
+entidades sin noticia vigente             0     
+frases clave sin noticia vigente          0     
+[6 filas | 25,987 bytes escaneados | 1231 ms | 17b2457d-3937-4894-8dbb-8775716346cf]

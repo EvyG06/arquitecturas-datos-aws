@@ -1,0 +1,41 @@
+== 7b. Fallo controlado, reejecucion de la ingesta ==
+2026-11-02 12:57:07 -05  (17:57:07 UTC)  cuenta 726168540074  region us-east-2
+
+2026-11-02 12:57:09,404 INFO dl.ingest task=ingest source=eltiempo_politica run_id=manual__fallo_20261101T163714Z ya ingerido, se omite
+2026-11-02 12:57:09,540 INFO dl.ingest task=ingest source=eltiempo_economia run_id=manual__fallo_20261101T163714Z ya ingerido, se omite
+2026-11-02 12:57:10,642 INFO dl.ingest task=ingest source=eltiempo_mundo run_id=manual__fallo_20261101T163714Z status=ok items=10 sha256=5f5026795e2e
+{
+  "run_id": "manual__fallo_20261101T163714Z",
+  "run_ts_utc": "2026-11-02T17:56:54.292+00:00",
+  "finished_at_utc": "2026-11-02T17:57:10.642+00:00",
+  "status": "complete",
+  "sources": {
+    "eltiempo_politica": {
+      "status": "ok",
+      "http_status": 200,
+      "item_count": 10,
+      "s3_uri": "s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_politica/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/feed.xml"
+    },
+    "eltiempo_economia": {
+      "status": "ok",
+      "http_status": 200,
+      "item_count": 10,
+      "s3_uri": "s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_economia/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/feed.xml"
+    },
+    "eltiempo_mundo": {
+      "status": "ok",
+      "http_status": 200,
+      "item_count": 10,
+      "s3_uri": "s3://eve-dl-726168540074-us-east-2/bronze/source=eltiempo_mundo/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/feed.xml"
+    }
+  }
+}
+exit=0
+
+Originales del lote en Bronze, uno por fuente
+2026-11-02 12:56:58        667 bronze/source=eltiempo_economia/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/_meta.json
+2026-11-02 12:56:58      12567 bronze/source=eltiempo_economia/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/feed.xml
+2026-11-02 12:57:11        654 bronze/source=eltiempo_mundo/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/_meta.json
+2026-11-02 12:57:11      12900 bronze/source=eltiempo_mundo/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/feed.xml
+2026-11-02 12:56:57        667 bronze/source=eltiempo_politica/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/_meta.json
+2026-11-02 12:56:56      13532 bronze/source=eltiempo_politica/ingestion_date=2026-11-02/run_id=manual__fallo_20261101T163714Z/feed.xml
