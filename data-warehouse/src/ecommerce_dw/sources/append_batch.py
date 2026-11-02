@@ -119,6 +119,7 @@ def write_mongo_documents(reviews, events):
     try:
         db = client[os.getenv("MONGO_DATABASE", "ecommerce")]
         ensure_mongo_collections(db)
+        aws_conn.cdc_stamp(reviews + events)
         for document in reviews:
             db["reviews"].replace_one({"_id": document["_id"]}, document, upsert=True)
         for document in events:

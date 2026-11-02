@@ -430,6 +430,7 @@ def load_mongo(args, rng, fake, customers, products, start, bad):
         events.delete_many({})
 
         review_docs, event_docs = build_mongo_documents(args, rng, fake, customers, products, start)
+        aws_conn.cdc_stamp(review_docs + event_docs + bad["mongo_reviews"] + bad["mongo_events"])
         if review_docs:
             reviews.insert_many(review_docs, ordered=True)
         if event_docs:

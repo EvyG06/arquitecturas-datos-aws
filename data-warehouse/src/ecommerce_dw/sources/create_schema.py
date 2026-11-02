@@ -4,6 +4,7 @@
 import re
 from pathlib import Path
 
+from ecommerce_dw.sources.cdc import add_cdc_columns
 from ecommerce_dw.sources.generate_data import connect_mysql, ensure_mongo_collections
 from ecommerce_dw import aws_conn
 
@@ -26,6 +27,7 @@ def main():
         with connection.cursor() as cursor:
             for statement in statements(SCHEMA.read_text(encoding="utf-8")):
                 cursor.execute(statement)
+            add_cdc_columns(cursor)
             cursor.execute("SHOW TABLES")
             tables = sorted(row[0] for row in cursor.fetchall())
         connection.commit()

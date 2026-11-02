@@ -8,5 +8,9 @@ cd "$(dirname "$0")"
 [ $# -gt 0 ] || { echo "Uso: $0 <modulo de ecommerce_dw> [argumentos]"; exit 2; }
 MODULE="$1"
 shift
-exec docker compose exec -T -e PYTHONPATH=/opt/dw/src -e PYTHONDONTWRITEBYTECODE=1 airflow-scheduler \
+case "$MODULE" in
+  sources.*) PROFILE=fuentes ;;   # sistema de origen simulado, con credenciales maestras
+  *) PROFILE=pipeline ;;           # extraccion y carga, solo con usuarios de lectura
+esac
+exec docker compose exec -T -e AWS_PROFILE="$PROFILE" -e PYTHONPATH=/opt/dw/src -e PYTHONDONTWRITEBYTECODE=1 airflow-scheduler \
   /home/airflow/dw-venv/bin/python -m "ecommerce_dw.$MODULE" "$@"

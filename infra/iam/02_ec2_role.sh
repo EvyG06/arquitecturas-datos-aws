@@ -21,8 +21,10 @@ else
 fi
 
 aws iam attach-role-policy --role-name "$ROLE" --policy-arn arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-aws iam put-role-policy --role-name "$ROLE" --policy-name asumir-pipeline --policy-document \
-  "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AsumirPipeline\",\"Effect\":\"Allow\",\"Action\":\"sts:AssumeRole\",\"Resource\":\"arn:aws:iam::${ACCOUNT_ID}:role/${PIPELINE_ROLE}\"}]}"
+# La instancia solo puede asumir los dos roles de trabajo: el pipeline y el sistema de origen simulado.
+aws iam put-role-policy --role-name "$ROLE" --policy-name asumir-roles --policy-document \
+  "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AsumirRolesDeTrabajo\",\"Effect\":\"Allow\",\"Action\":\"sts:AssumeRole\",\"Resource\":[\"arn:aws:iam::${ACCOUNT_ID}:role/${PIPELINE_ROLE}\",\"arn:aws:iam::${ACCOUNT_ID}:role/arq-datos-fuentes\"]}]}"
+aws iam delete-role-policy --role-name "$ROLE" --policy-name asumir-pipeline 2>/dev/null || true
 
 if aws iam get-instance-profile --instance-profile-name "$ROLE" >/dev/null 2>&1; then
   echo "Perfil de instancia ya existe: $ROLE"
@@ -33,13 +35,16 @@ else
 fi
 
 # IAM tarda unos segundos en reconocer un rol nuevo como principal valido de otra politica.
+APLICADA=0
 for intento in 1 2 3 4 5 6; do
   if ./infra/iam/01_pipeline_role.sh; then
+    APLICADA=1
     break
   fi
   echo "IAM aun no reconoce $ROLE como principal, reintento en 10 s ($intento de 6)"
   sleep 10
 done
+[ "$APLICADA" = 1 ] || { echo "No se pudo actualizar la confianza de $PIPELINE_ROLE"; exit 1; }
 
 echo
 echo "Confianza de $PIPELINE_ROLE"

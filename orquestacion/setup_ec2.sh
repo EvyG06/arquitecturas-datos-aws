@@ -28,13 +28,20 @@ else
   echo ".env ya existe, se conservan los secretos"
 fi
 
-# Los contenedores asumen arq-datos-pipeline encadenando desde el rol de la instancia.
+# Los contenedores asumen un rol de trabajo encadenando desde el rol de la instancia.
+# pipeline: extraccion, carga y transformacion. fuentes: el sistema de origen simulado del DW.
 mkdir -p aws
 cat > aws/config <<CFG
 [profile pipeline]
 role_arn = arn:aws:iam::${ACCOUNT_ID}:role/arq-datos-pipeline
 credential_source = Ec2InstanceMetadata
 role_session_name = airflow-ec2
+region = ${REGION}
+
+[profile fuentes]
+role_arn = arn:aws:iam::${ACCOUNT_ID}:role/arq-datos-fuentes
+credential_source = Ec2InstanceMetadata
+role_session_name = fuentes-ec2
 region = ${REGION}
 CFG
 chmod 755 aws

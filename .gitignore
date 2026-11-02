@@ -12,3 +12,4 @@ data-warehouse/src/dbt/logs/
 .user.yml
 orquestacion/.env
 orquestacion/aws/
+.logs/
