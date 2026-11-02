@@ -1,5 +1,9 @@
-Ejecuciones del DAG registradas por la etapa 9: 1
+Ejecuciones del DAG registradas por la etapa 9: 5
 
-registrado_utc       dag_run_id                            modo    resultado  fallidas  fuentes                           
--------------------  ------------------------------------  ------  ---------  --------  ----------------------------------
-2026-11-02 19:19:25  scheduled__2026-11-02T18:30:00+00:00  normal  completa   -         economia=ok, mundo=ok, politica=ok
+registrado_utc       dag_run_id                            modo       resultado  fallidas                                                      fuentes                           
+-------------------  ------------------------------------  ---------  ---------  ------------------------------------------------------------  ----------------------------------
+2026-11-02 19:19:25  scheduled__2026-11-02T18:30:00+00:00  normal     completa   -                                                             economia=ok, mundo=ok, politica=ok
+2026-11-02 19:31:39  manual__2026-11-02T19:24:16+00:00     reproceso  fallida    actualizar_glue_catalog, construir_gold, enriquecer_con_comp  -                                 
+2026-11-02 19:32:10  manual__2026-11-02T19:24:46+00:00     reproceso  completa   -                                                             economia=ok, mundo=ok, politica=ok
+2026-11-02 19:33:00  scheduled__2026-11-02T19:00:00+00:00  normal     completa   -                                                             economia=ok, mundo=ok, politica=ok
+2026-11-02 19:42:59  manual__2026-11-02T19:38:59+00:00     reproceso  completa   -                                                             economia=ok, mundo=ok, politica=ok

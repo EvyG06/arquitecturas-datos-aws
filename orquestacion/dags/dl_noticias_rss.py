@@ -125,7 +125,10 @@ with DAG(
     },
     tags=["data-lake", "rss", "eia"],
 ) as dag:
-    validar = tarea("validar_configuracion", f"exec {PYTHON_DL} -m dl.preflight")
+    # Sin reintentos: un error de configuracion o un lote inexistente no se arregla esperando, y los
+    # errores transitorios de las APIs de AWS ya los reintenta boto3 por dentro.
+    validar = tarea("validar_configuracion",
+                    f'exec {PYTHON_DL} -m dl.preflight ${{REPROCESAR:+--reprocesar "$REPROCESAR"}}', retries=0)
 
     extraer = tarea(
         "extraer_feeds_a_bronze",

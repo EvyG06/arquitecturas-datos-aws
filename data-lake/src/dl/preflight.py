@@ -1,6 +1,7 @@
 """Etapa 1 del DAG: valida la configuracion y el acceso a cada servicio antes de tocar datos."""
 from __future__ import annotations
 
+import argparse
 import json
 import logging
 import sys
@@ -9,12 +10,27 @@ import boto3
 
 from dl.athena import WORKGROUP
 from dl.catalog import DATABASE
-from dl.config import bucket, load_sources
+from dl.config import bucket, load_sources, safe_run_id
+from dl.s3util import read_json
 
 log = logging.getLogger("dl.preflight")
 
 
-def checks():
+def check_lote(s3, bkt: str, lote: str) -> str:
+    """Un reproceso solo tiene sentido sobre un lote que exista en Bronze con al menos una fuente valida."""
+    run = read_json(s3, bkt, f"_control/ingestion/run_id={lote}/_run.json")
+    if run is None:
+        raise ValueError(f"El lote {lote!r} no existe en Bronze")
+    ok = sorted(k for k, v in run["sources"].items() if v["status"] in ("ok", "ok_no_items"))
+    if not ok:
+        raise ValueError(f"El lote {lote!r} no tiene ninguna fuente valida en Bronze")
+    return f"{lote} estado={run['status']} fuentes={','.join(ok)}"
+
+
+def checks(reprocesar: str | None = None):
+    if reprocesar:
+        lote = safe_run_id(reprocesar)
+        yield "lote_a_reprocesar", lambda: check_lote(boto3.client("s3"), bucket(), lote)
     yield "configuracion", lambda: f"{len(load_sources())} fuentes validas"
     yield "identidad", lambda: boto3.client("sts").get_caller_identity()["Arn"]
     yield "s3", lambda: (boto3.client("s3").head_bucket(Bucket=bucket()), f"s3://{bucket()}")[1]
@@ -25,10 +41,13 @@ def checks():
 
 
 def main(argv: list[str] | None = None) -> int:
+    p = argparse.ArgumentParser(description="Valida configuracion y acceso a los servicios")
+    p.add_argument("--reprocesar", help="lote de Bronze que se va a reprocesar")
+    args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     logging.getLogger("botocore").setLevel(logging.WARNING)
     results, failed = {}, []
-    for name, check in checks():
+    for name, check in checks(args.reprocesar):
         try:
             results[name] = {"ok": True, "detalle": check()}
             log.info("task=preflight servicio=%s ok %s", name, results[name]["detalle"])
