@@ -12,6 +12,7 @@ desde la terminal, dentro de los venvs de la imagen (dw-venv y dbt-venv), con el
 | 4. Carga a Redshift | `cargar_redshift` (COPY por lote en una transaccion) |
 | 5. Transformaciones y snapshots | `dbt_seed`, `dbt_run_intermediate`, `dbt_run_quarantine`, `dbt_snapshot`, `dbt_run_marts` |
 | 6. Pruebas de calidad | `dbt_test` y `validar_conciliacion` (MySQL contra marts) |
+| Consumo | `refrescar_quicksight`: refresca el dataset SPICE del dashboard (se omite si QuickSight no existe) |
 | 7. Registro del resultado | `registrar_resultado`, en `_control/pipeline/` del bucket del DW |
 
 **Lote.** Cada ejecucion es un lote cuyo id es el `run_id` convertido a caracteres seguros. El lote cuenta como
@@ -173,8 +174,11 @@ with DAG(
     conciliar = tarea("validar_conciliacion",
                       f"exec {PY} -m ecommerce_dw.loading.consultas conciliacion huella cuarentena", retries=1)
 
+    refrescar = tarea("refrescar_quicksight", f'exec {PY} -m ecommerce_dw.pipeline.quicksight --lote "$LOTE"',
+                      skip_on_exit_code=99, retries=1)
+
     registrar = PythonOperator(task_id="registrar_resultado", python_callable=registrar_resultado,
                                trigger_rule="all_done", retries=0)
 
     validar >> extraer >> registrar_lote >> cargar
-    cargar >> seed >> intermedia >> cuarentena >> snapshots >> marts >> pruebas >> conciliar >> registrar
+    cargar >> seed >> intermedia >> cuarentena >> snapshots >> marts >> pruebas >> conciliar >> refrescar >> registrar

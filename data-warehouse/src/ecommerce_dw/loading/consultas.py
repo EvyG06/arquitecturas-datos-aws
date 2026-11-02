@@ -7,6 +7,7 @@ con codigo 1 si alguna de sus verificaciones falla.
   cuarentena    rechazos por regla y lote de origen
   scd2          historia del cliente 1 y del producto 1, y que haya una sola version vigente por llave
   conciliacion  ventas desde MySQL hasta fct_sales: fuente = staging = validas + cuarentena, y hechos = validas
+  indicador     el KPI del dashboard (ventas totales) con y sin el filtro por canal, y su fecha de actualizacion
 """
 from __future__ import annotations
 
@@ -49,6 +50,18 @@ order by 1, 5
 VIGENTES_DUPLICADOS = """
 select (select count(*) from (select customer_id from marts.dim_customer where is_current group by 1 having count(*) > 1) c)
      + (select count(*) from (select product_id from marts.dim_product where is_current group by 1 having count(*) > 1) p)
+"""
+
+# La misma consulta esta en docs/dw/consulta_indicador.sql para entregarla con el dashboard.
+INDICADOR = """
+select 'Todos los canales' as filtro, count(*) as lineas, sum(subtotal) as ventas_totales,
+       max(actualizado_en) as actualizado_en
+from marts.ventas_dashboard
+union all
+select 'canal = ' || canal, count(*), sum(subtotal), max(actualizado_en)
+from marts.ventas_dashboard
+group by canal
+order by 1
 """
 
 CONCILIACION = """
@@ -138,7 +151,13 @@ def conciliacion(api) -> bool:
     return all(checks.values())
 
 
-CONSULTAS = {"huella": huella, "capas": capas, "cuarentena": cuarentena, "scd2": scd2, "conciliacion": conciliacion}
+def indicador(api) -> bool:
+    _table(["filtro", "lineas", "ventas_totales", "actualizado_en (UTC)"], api.query(INDICADOR, "dw-indicador"))
+    return True
+
+
+CONSULTAS = {"huella": huella, "capas": capas, "cuarentena": cuarentena, "scd2": scd2, "conciliacion": conciliacion,
+             "indicador": indicador}
 
 
 def main(argv=None) -> int:

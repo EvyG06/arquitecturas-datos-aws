@@ -1,6 +1,19 @@
 version: 2
 
 models:
+  - name: ventas_dashboard
+    description: Tabla de consumo del dashboard de QuickSight. Una fila por linea de venta, con la categoria vigente en la fecha de la venta.
+    columns:
+      - name: sale_sk
+        tests: [unique, not_null]
+      - name: fecha
+        tests: [not_null]
+      - name: categoria
+        tests: [not_null]
+      - name: canal
+        tests: [not_null]
+      - name: subtotal
+        tests: [not_null]
   - name: dim_customer
     description: Clientes con SCD tipo 2. Cada versión se abre cuando cambia updated_at en MySQL.
     columns:
