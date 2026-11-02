@@ -1,0 +1,21 @@
+
+## cuarentena
+entidad                       motivo                 lote de origen  filas
+documentdb.navigation_events  invalid_event_type     ext_01_inicial  2    
+documentdb.navigation_events  missing_occurred_at    ext_01_inicial  2    
+documentdb.navigation_events  orphan_customer        ext_01_inicial  2    
+documentdb.navigation_events  orphan_product         ext_01_inicial  2    
+documentdb.reviews            invalid_rating         ext_01_inicial  2    
+documentdb.reviews            missing_reviewed_at    ext_01_inicial  2    
+documentdb.reviews            orphan_customer        ext_01_inicial  2    
+documentdb.reviews            orphan_product         ext_01_inicial  2    
+mysql.customers               invalid_email          ext_01_inicial  2    
+mysql.customers               missing_name           ext_01_inicial  2    
+mysql.order_items             orphan_order           ext_01_inicial  2    
+mysql.order_items             orphan_product         ext_01_inicial  2    
+mysql.order_items             subtotal_mismatch      ext_01_inicial  2    
+mysql.orders                  invalid_sales_channel  ext_01_inicial  2    
+mysql.orders                  orphan_customer        ext_01_inicial  2    
+mysql.products                missing_category       ext_01_inicial  2    
+	
+[ssm c964c496-d5a2-4791-b45e-ac7de5e38e5d | estado Success | codigo 0]

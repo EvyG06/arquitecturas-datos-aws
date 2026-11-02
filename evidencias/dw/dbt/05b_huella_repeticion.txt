@@ -1,0 +1,11 @@
+
+## huella
+tabla                  filas  llaves  total o vigentes
+dim_customer           50     50      50.00           
+dim_product            25     25      25.00           
+fct_navigation_events  509    509                     
+fct_reviews            159    159     500.00          
+fct_sales              262    262     7484200.74      
+	
+[ssm 0a364782-1d05-4261-8acd-f556d65456d5 | estado Success | codigo 0]
+OK: la huella de hechos y dimensiones es identica antes y despues de repetir el lote

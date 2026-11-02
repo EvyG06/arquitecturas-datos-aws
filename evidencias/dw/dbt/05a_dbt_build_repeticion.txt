@@ -1,0 +1,53 @@
+[0m23:11:30  111 of 129 PASS relationships_fct_navigation_events_date_sk__date_sk__ref_dim_date_  [[32mPASS[0m in 0.67s]
+[0m23:11:30  115 of 129 START test unique_fct_navigation_events_navigation_event_sk ......... [RUN]
+[0m23:11:30  113 of 129 PASS relationships_fct_navigation_events_product_sk__product_sk__ref_dim_product_  [[32mPASS[0m in 0.93s]
+[0m23:11:30  116 of 129 START test assert_sales_dates_match_raw_order_dates ................. [RUN]
+[0m23:11:31  112 of 129 PASS relationships_fct_navigation_events_event_type_sk__event_type_sk__ref_dim_event_type_  [[32mPASS[0m in 1.02s]
+[0m23:11:31  117 of 129 START test assert_sales_totals_match_source_by_business_date ........ [RUN]
+[0m23:11:31  115 of 129 PASS unique_fct_navigation_events_navigation_event_sk ............... [[32mPASS[0m in 0.61s]
+[0m23:11:31  118 of 129 START test not_null_fct_sales_customer_sk ........................... [RUN]
+[0m23:11:31  114 of 129 PASS relationships_fct_navigation_events_sales_channel_sk__sales_channel_sk__ref_dim_sales_channel_  [[32mPASS[0m in 1.32s]
+[0m23:11:31  119 of 129 START test not_null_fct_sales_date_sk ............................... [RUN]
+[0m23:11:32  119 of 129 PASS not_null_fct_sales_date_sk ..................................... [[32mPASS[0m in 0.68s]
+[0m23:11:32  120 of 129 START test not_null_fct_sales_geography_sk .......................... [RUN]
+[0m23:11:32  118 of 129 PASS not_null_fct_sales_customer_sk ................................. [[32mPASS[0m in 0.99s]
+[0m23:11:32  121 of 129 START test not_null_fct_sales_product_sk ............................ [RUN]
+[0m23:11:32  117 of 129 PASS assert_sales_totals_match_source_by_business_date .............. [[32mPASS[0m in 1.36s]
+[0m23:11:32  122 of 129 START test not_null_fct_sales_sale_sk ............................... [RUN]
+[0m23:11:32  116 of 129 PASS assert_sales_dates_match_raw_order_dates ....................... [[32mPASS[0m in 1.45s]
+[0m23:11:32  123 of 129 START test not_null_fct_sales_sales_channel_sk ...................... [RUN]
+[0m23:11:33  123 of 129 PASS not_null_fct_sales_sales_channel_sk ............................ [[32mPASS[0m in 0.71s]
+[0m23:11:33  124 of 129 START test relationships_fct_sales_customer_sk__customer_sk__ref_dim_customer_  [RUN]
+[0m23:11:33  122 of 129 PASS not_null_fct_sales_sale_sk ..................................... [[32mPASS[0m in 0.88s]
+[0m23:11:33  120 of 129 PASS not_null_fct_sales_geography_sk ................................ [[32mPASS[0m in 1.22s]
+[0m23:11:33  125 of 129 START test relationships_fct_sales_date_sk__date_sk__ref_dim_date_ .. [RUN]
+[0m23:11:33  126 of 129 START test relationships_fct_sales_geography_sk__geography_sk__ref_dim_geography_  [RUN]
+[0m23:11:33  121 of 129 PASS not_null_fct_sales_product_sk .................................. [[32mPASS[0m in 1.25s]
+[0m23:11:33  127 of 129 START test relationships_fct_sales_product_sk__product_sk__ref_dim_product_  [RUN]
+[0m23:11:33  124 of 129 PASS relationships_fct_sales_customer_sk__customer_sk__ref_dim_customer_  [[32mPASS[0m in 0.75s]
+[0m23:11:33  128 of 129 START test relationships_fct_sales_sales_channel_sk__sales_channel_sk__ref_dim_sales_channel_  [RUN]
+[0m23:11:34  125 of 129 PASS relationships_fct_sales_date_sk__date_sk__ref_dim_date_ ........ [[32mPASS[0m in 0.90s]
+[0m23:11:34  129 of 129 START test unique_fct_sales_sale_sk ................................. [RUN]
+[0m23:11:34  127 of 129 PASS relationships_fct_sales_product_sk__product_sk__ref_dim_product_  [[32mPASS[0m in 0.93s]
+[0m23:11:34  126 of 129 PASS relationships_fct_sales_geography_sk__geography_sk__ref_dim_geography_  [[32mPASS[0m in 1.00s]
+[0m23:11:34  128 of 129 PASS relationships_fct_sales_sales_channel_sk__sales_channel_sk__ref_dim_sales_channel_  [[32mPASS[0m in 0.67s]
+[0m23:11:34  129 of 129 PASS unique_fct_sales_sale_sk ....................................... [[32mPASS[0m in 0.52s]
+[0m23:11:34  
+[0m23:11:34  Finished running 3 incremental models, 2 seeds, 2 snapshots, 18 table models, 92 data tests, 12 view models in 0 hours 1 minutes and 19.23 seconds (79.23s).
+[0m23:11:34  
+[0m23:11:34  [32mCompleted successfully[0m
+[0m23:11:34  
+[0m23:11:34  Done. PASS=129 WARN=0 ERROR=0 SKIP=0 TOTAL=129
+	
+[ssm 3e8e962e-9141-4b57-9eba-933154178470 | estado Success | codigo 0]
+dbt build | generado 2026-11-02T23:11:34.860332Z | 79.2 s | 129 nodos
+
+tipo       estado     nodos
+model      success       33
+seed       success        2
+snapshot   success        2
+test       pass          92
+
+OK: sin errores ni fallos
+	
+[ssm 55d34a2d-cdc9-4298-851c-e201b61e3b91 | estado Success | codigo 0]

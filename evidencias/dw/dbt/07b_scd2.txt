@@ -1,0 +1,19 @@
+
+## scd2
+entidad   id  valor        detalle       desde       hasta       vigente
+cliente   1   Bogotá       Bogotá, D.C.  2024-11-10  2025-07-01  False  
+cliente   1   Medellín     Antioquia     2025-07-01              True   
+producto  1   Electrónica                2025-01-01  2025-07-01  False  
+producto  1   Hogar                      2025-07-01              True   
+
+llaves con mas de una version vigente: 0
+
+## huella
+tabla                  filas  llaves  total o vigentes
+dim_customer           51     50      50.00           
+dim_product            26     25      25.00           
+fct_navigation_events  512    512                     
+fct_reviews            162    162     511.00          
+fct_sales              265    265     7547670.90      
+	
+[ssm 6993fcc2-4f50-4670-9f9b-b4927c64ded1 | estado Success | codigo 0]

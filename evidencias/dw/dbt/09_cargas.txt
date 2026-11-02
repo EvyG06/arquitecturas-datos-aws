@@ -1,0 +1,17 @@
+seq  modo        filas  cargado_utc          batch_id
+  1  inicial      1112  2026-11-02 22:47:56  ext_01_inicial
+  2  incremental    12  2026-11-02 22:49:08  ext_02_incremental_negocio2
+  3  incremental    24  2026-11-02 22:48:14  ext_03_fallo_y_reintento_negocio3
+  4  incremental    36  2026-11-02 23:09:58  ext_04_incremental_negocio4
+  5  incremental    24  2026-11-02 23:12:31  ext_05_incremental_negocio5
+  6  incremental    14  2026-11-02 23:14:52  ext_06_scd2_cliente1_producto1
+
+tabla                             filas lotes
+"raw".mysql_products                 28     2
+"raw".mysql_orders                  133     6
+"raw".mysql_order_items             286     6
+"raw".mongo_reviews                 185     6
+"raw".mongo_navigation_events       535     6
+"raw".mysql_customers                55     2
+	
+[ssm 6739a902-6735-4b33-acb5-efa3715682b7 | estado Success | codigo 0]

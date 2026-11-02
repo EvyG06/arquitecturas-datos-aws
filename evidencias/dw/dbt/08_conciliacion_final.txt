@@ -1,0 +1,15 @@
+
+## conciliacion
+capa                              lineas  subtotal  
+MySQL (fuente, etl_lector)        271     7547740.90
+staging: ultima version           271     7547740.90
+cuarentena de items               6       70.00     
+items validos                     265     7547670.90
+items validos de pedidos validos  265     7547670.90
+marts.fct_sales                   265     7547670.90
+
+OK    fuente = staging
+OK    staging = validos + cuarentena
+OK    fct_sales = validos de pedidos validos
+	
+[ssm 0e85a0f8-86ec-4bc6-a5ff-e61be7e23cad | estado Success | codigo 0]

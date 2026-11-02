@@ -1,0 +1,19 @@
+
+## huella
+tabla                  filas  llaves  total o vigentes
+dim_customer           50     50      50.00           
+dim_product            25     25      25.00           
+fct_navigation_events  509    509                     
+fct_reviews            159    159     500.00          
+fct_sales              262    262     7484200.74      
+
+## capas
+entidad                       raw (versiones)  staging (ultima)
+mysql.orders                  124              115             
+mysql.customers               54               54              
+mysql.order_items             277              268             
+documentdb.navigation_events  526              517             
+mysql.products                27               27              
+documentdb.reviews            176              167             
+	
+[ssm e503f9b4-2381-4824-a6de-0ab71f06362d | estado Success | codigo 0]
