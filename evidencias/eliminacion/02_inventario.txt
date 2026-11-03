@@ -1,0 +1,45 @@
+Cuenta 726168540074 | region us-east-2 | identidad arn:aws:iam::726168540074:user/desarrollo_IngDatos
+Modo: inventario, no se modifica nada
+
+Fase 1
+  QuickSight dashboard                                       arq-datos-ventas
+  QuickSight analisis                                        arq-datos-ventas-analisis
+  QuickSight dataset SPICE                                   arq-datos-ventas
+  QuickSight fuente de datos                                 arq-datos-dw-redshift
+  QuickSight conexion VPC                                    arq-datos-dw-vpc | CREATION_SUCCESSFUL
+  DocumentDB instancia                                       arq-datos-dw-docdb-1 | stopped
+
+Fase 2
+  QuickSight suscripcion                                     eve-arq-datos-726168540074 | ENTERPRISE ACCOUNT_CREATED
+  RDS grupo de subredes                                      arq-datos-dw-mysql
+  RDS grupo de parametros                                    arq-datos-dw-mysql84
+  DocumentDB cluster (con su secreto maestro)                arq-datos-dw-docdb | stopped
+
+Fase 3
+  DocumentDB grupo de subredes                               arq-datos-dw-docdb
+  S3 bucket del data lake, con todas sus versiones           eve-dl-726168540074-us-east-2 | 533 versiones
+  S3 bucket del data warehouse, con todas sus versiones      eve-dw-726168540074-us-east-2 | 193 versiones
+  Glue Data Catalog base (tablas y particiones)              arq_dl | 6 tablas
+  Athena workgroup                                           arq-dl
+  Parametros de SSM                                          /arq-datos/* | 15 parametros
+  Secreto (sin ventana de recuperacion)                      arq-datos/dw/mysql-lector
+  Secreto (sin ventana de recuperacion)                      arq-datos/dw/docdb-lector
+  CloudWatch grupo de logs                                   /aws/redshift/arq-datos-dw/connectionlog | 631613 bytes
+  CloudWatch grupo de logs                                   /aws/redshift/arq-datos-dw/userlog | 178 bytes
+  Security groups                                            4 grupos | arq-datos-dw-fuentes (sg-0bd242d1fd81e4cef), arq-datos-dw-redshift (sg-0bfe9c73416cedd99), arq-datos-quicksight (sg-095fef094ef244d85), arq-datos-airflow (sg-0812ec4e4cf46b254)
+
+Fase 4
+  IAM perfil de instancia                                    arq-datos-ec2
+  IAM rol (con sus politicas en linea)                       arq-datos-quicksight-vpc
+  IAM rol (con sus politicas en linea)                       arq-datos-redshift-s3
+  IAM rol (con sus politicas en linea)                       arq-datos-fuentes
+  IAM rol (con sus politicas en linea)                       arq-datos-pipeline
+  IAM rol (con sus politicas en linea)                       arq-datos-ec2
+
+Recursos con la etiqueta Project=arquitecturas-datos: 38. No cubiertos por el inventario: 2
+  arn:aws:ec2:us-east-2:726168540074:instance/i-06984db67e77858be
+  arn:aws:secretsmanager:us-east-2:726168540074:secret:arq-datos/dw/redshift-bi-lector-1GxIM1
+
+Para revisar a mano:
+  llave de despliegue de GitHub: borrala a mano en Settings > Deploy keys del repositorio
+  presupuesto arquitecturas-datos-mensual: se conserva, con --incluir-presupuesto tambien se borra
