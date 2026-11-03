@@ -1,0 +1,60 @@
+Costos del proyecto | 2026-11-02 20:14 | region us-east-2
+
+## 1. Precios unitarios en us-east-2 (USD)
+  concepto                     USD      origen          unidad y descripcion de AWS                                                    
+  ec2_t3_medium_hora           0.0416   Price List API  Hrs | $0.0416 per On Demand Linux t3.medium Instance Hour                      
+  ebs_gp3_gb_mes               0.0800   Price List API  GB-Mo | $0.08 per GB-month of General Purpose (gp3) provisioned storage - US E 
+  ipv4_publica_hora            0.0050   Price List API  Hrs | $0.005 per In-use public IPv4 address per hour                           
+  rds_t4g_micro_hora           0.0160   Price List API  Hrs | $ 0.016 per RDS db.t4g.micro Single-AZ instance hour (or partial hour)   
+  rds_gp3_gb_mes               0.1150   Price List API  GB-Mo | $0.115 per GB-month of provisioned GP3 storage running MySQL           
+  docdb_t3_medium_hora         0.0780   Price List API  Hrs | $0.078 per db.t3.medium instance hour (or partial hour) running Amazon   
+  docdb_almacenamiento_gb_mes  0.1000   Price List API  GB-Mo | $0.10 per GB-month of consumed storage (Amazon DocumentDB)             
+  redshift_rpu_hora            0.3750   documentado     la API dio 2333.0000 (RPU-Hr | $2,333.00 per RPU-Hr for Redshi), fuera de rango
+  redshift_rms_gb_mes          0.0240   documentado                                                                                    
+  s3_standard_gb_mes           0.0230   Price List API  GB-Mo | $0.023 per GB - first 50 TB / month of storage used                    
+  secreto_mes                  0.4000   Price List API  Secrets | $0.40 per Secret                                                     
+  quicksight_autor_mes         24.0000  documentado                                                                                    
+  comprehend_unidad            0.0001   documentado                                                                                    
+  athena_tb                    5.0000   documentado                                                                                    
+
+## 2. Uso medido en la cuenta
+  recurso                            estado                                               
+  EC2 de Airflow                     stopped                                              
+  RDS for MySQL                      stopping                                             
+  DocumentDB                         stopping                                             
+  Usuarios de QuickSight             726168540074 (ADMIN), desarrollo_IngDatos (ADMIN_PRO)
+  Autores de QuickSight              2                                                    
+  Secretos en Secrets Manager        6                                                    
+  Datos en S3 (todas las versiones)  2.5 MB                                               
+  Redshift RPU-horas en el mes       0.99                                                 
+
+  Redshift Serverless por dia (metrica ComputeSeconds de CloudWatch):
+  dia UTC     RPU-horas
+  2026-11-01  0.85     
+  2026-11-02  0.14     
+
+## 3. Escenarios (USD, precios de lista antes de capas gratuitas y creditos)
+  escenario                                                      USD     composicion                                      
+  Hora con EC2, RDS y DocumentDB encendidos                      0.141   EC2 + IPv4 publica + RDS + DocumentDB            
+  Lote del DW en Redshift (supuesto 0.5 RPU-h)                   0.188   4 RPU durante unos 7 minutos de consultas        
+  Tope diario de Redshift (10 RPU-h)                             3.75    el limite de uso desactiva el workgroup al llegar
+  Mes con todo apagado                                           7.23    discos, almacenamiento de bases, secretos y S3   
+  QuickSight, 2 autor(es)                                        48.00   0 durante la prueba de 30 dias                   
+  Mes de laboratorio (20 h encendido, 10 lotes DW, 40 lotes DL)  12.44   sin QuickSight; Comprehend 0.52, Athena 0.0153   
+  Mes encendido sin parar (730 h)                                109.86  sin Redshift ni QuickSight                       
+
+## 4. Gasto real en Cost Explorer (USD, costo sin mezclar, antes de creditos)
+  mes      servicio                            USD 
+  2026-10  AWS Secrets Manager                 0.44
+  2026-10  Amazon Relational Database Service  0.12
+  2026-10  AWS Cost Explorer                   0.04
+
+  Por tipo de registro (Credit son los creditos aplicados, en negativo):
+  mes      tipo    USD  
+  2026-10  Credit  -0.60
+  2026-10  Tax     0.00 
+  2026-10  Usage   0.60 
+  2026-11  Credit  -0.01
+  2026-11  Usage   0.01 
+
+  Presupuesto arquitecturas-datos-mensual: limite 40.0 USD, gasto real 0.005 USD, pronostico 0.176 USD (sin creditos)
