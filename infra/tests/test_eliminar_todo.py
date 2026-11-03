@@ -211,3 +211,27 @@ def test_no_cubiertos_detecta_recursos_etiquetados_fuera_del_inventario():
     arns = ["arn:aws:rds:us-east-2:1:db:arq-datos-dw-mysql", "arn:aws:sns:us-east-2:1:alarma",
             f"arn:aws:budgets::1:budget/{et.PRESUPUESTO}"]
     assert et.no_cubiertos(arns, [r]) == ["arn:aws:sns:us-east-2:1:alarma"]
+
+
+def test_cubre_ids_de_recurso_y_secretos_administrados_sin_importar_mayusculas():
+    secreto = "arn:aws:secretsmanager:us-east-2:1:secret:rds!cluster-91eb"
+    r = et.Recurso(2, "x", et.DOCDB, "", et.nada, claves=[et.DOCDB, "cluster-DCD4BQAI72", secreto])
+    arns = ["arn:aws:rds:us-east-2:1:cluster:cluster-dcd4bqai72",
+            "arn:aws:secretsmanager:us-east-2:1:secret:rds!cluster-91eb"]
+    assert et.no_cubiertos(arns, [r]) == []
+
+
+def test_explicar_cluster_por_id_de_recurso(monkeypatch):
+    ses = boto3.Session(region_name=REGION, aws_access_key_id="x", aws_secret_access_key="x")
+    rds = ses.client("rds")
+    st = Stubber(rds)
+    st.add_response("describe_db_clusters", {"DBClusters": []},
+                    {"Filters": [{"Name": "db-cluster-resource-id", "Values": ["CLUSTER-ABC"]}]})
+    st.add_response("describe_db_clusters", {"DBClusters": [
+        {"DBClusterIdentifier": "viejo", "Engine": "docdb", "Status": "available"}]},
+                    {"Filters": [{"Name": "db-cluster-id", "Values": ["viejo"]}]})
+    st.activate()
+    monkeypatch.setattr(ses, "client", lambda nombre, **kw: rds)
+    assert "ya borrado" in et.explicar(ses, "arn:aws:rds:us-east-2:1:cluster:cluster-abc")
+    assert et.explicar(ses, "arn:aws:rds:us-east-2:1:cluster:viejo") == "cluster viejo, motor docdb, estado available"
+    assert et.explicar(ses, "arn:aws:s3:::otro") == ""

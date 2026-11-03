@@ -42,6 +42,10 @@ DOCUMENTADOS = {
     "s3_standard_gb_mes": 0.023,
     "secreto_mes": 0.40,
     "quicksight_autor_mes": 24.0,
+    "quicksight_autor_pro_mes": 40.0,
+    "quicksight_lector_mes": 3.0,
+    "quicksight_lector_pro_mes": 20.0,
+    "quicksight_cuenta_con_pro_mes": 250.0,  # se cobra si hay al menos un usuario Pro, Q o Dashboard Q&A
     "comprehend_unidad": 0.0001,  # 100 caracteres, minimo 3 unidades por documento y por API
     "athena_tb": 5.0,  # minimo 10 MB por consulta
 }
@@ -60,7 +64,7 @@ BUSQUEDAS = {
     "docdb_almacenamiento_gb_mes": ("AmazonDocDB", {"usagetype": f"{PREFIJO_USO}-StorageUsage"}, None),
     "redshift_rpu_hora": ("AmazonRedshift", {"regionCode": REGION},
                           lambda attrs, dim: "serverless" in attrs.get("usagetype", "").lower()
-                          and "rpu" in dim.get("unit", "").lower()),
+                          and "rpu" in dim.get("unit", "").lower()),  # la API mezcla reservas: se usa el menor
     "s3_standard_gb_mes": ("AmazonS3", {"usagetype": f"{PREFIJO_USO}-TimedStorage-ByteHrs"}, None),
     "secreto_mes": ("AWSSecretsManager", {"regionCode": REGION},
                     lambda attrs, dim: "api" not in attrs.get("usagetype", "").lower()
@@ -79,8 +83,11 @@ def tabla(filas: list[tuple], encabezado: tuple) -> None:
         print("  " + "  ".join(str(c).ljust(a) for c, a in zip(f, anchos, strict=True)))
 
 
-def precio_api(pricing, servicio: str, filtros: dict, cond) -> tuple[float, str] | None:
-    """Mayor precio bajo demanda que cumple los filtros (en S3 es el primer tramo). None si no hay ninguno."""
+MENOR = {"redshift_rpu_hora"}  # aqui el precio mas alto es de una reserva, no el bajo demanda
+
+
+def precio_api(pricing, servicio: str, filtros: dict, cond, menor: bool = False) -> tuple[float, str] | None:
+    """Mayor precio que cumple los filtros (en S3 es el primer tramo), o el menor si menor=True."""
     kwargs = {"ServiceCode": servicio, "MaxResults": 100,
               "Filters": [{"Type": "TERM_MATCH", "Field": k, "Value": v} for k, v in filtros.items()]}
     mejor = None
@@ -92,7 +99,8 @@ def precio_api(pricing, servicio: str, filtros: dict, cond) -> tuple[float, str]
             for termino in prod.get("terms", {}).get("OnDemand", {}).values():
                 for dim in termino.get("priceDimensions", {}).values():
                     usd = float(dim.get("pricePerUnit", {}).get("USD", "0") or 0)
-                    if usd > 0 and (cond is None or cond(attrs, dim)) and (mejor is None or usd > mejor[0]):
+                    mejora = mejor is None or (usd < mejor[0] if menor else usd > mejor[0])
+                    if usd > 0 and (cond is None or cond(attrs, dim)) and mejora:
                         mejor = (usd, f"{dim.get('unit', '')} | {dim.get('description', '')[:70]}")
         if not resp.get("NextToken"):
             break
@@ -109,7 +117,7 @@ def precios(ses) -> dict[str, float]:
         if clave in BUSQUEDAS:
             servicio, filtros, cond = BUSQUEDAS[clave]
             try:
-                encontrado = precio_api(pricing, servicio, filtros, cond)
+                encontrado = precio_api(pricing, servicio, filtros, cond, menor=clave in MENOR)
             except (ClientError, BotoCoreError) as err:
                 encontrado, detalle = None, f"API: {err}"[:70]
             if encontrado and abs(encontrado[0] - respaldo) <= 0.5 * respaldo:
@@ -146,7 +154,8 @@ def uso(ses) -> dict:
     cuenta = ses.client("sts").get_caller_identity()["Account"]
     try:
         usuarios = ses.client("quicksight").list_users(AwsAccountId=cuenta, Namespace="default")["UserList"]
-        datos["autores_qs"] = sum(u.get("Role") in ("ADMIN", "AUTHOR", "ADMIN_PRO", "AUTHOR_PRO") for u in usuarios)
+        datos["roles_qs"] = [u.get("Role", "") for u in usuarios if u.get("Active", True)]
+        datos["autores_qs"] = sum(r in ("ADMIN", "AUTHOR", "ADMIN_PRO", "AUTHOR_PRO") for r in datos["roles_qs"])
         datos["usuarios_qs"] = ", ".join(f"{u['UserName']} ({u.get('Role')})" for u in usuarios)
     except ClientError as err:
         datos["autores_qs"], datos["usuarios_qs"] = 0, f"sin QuickSight ({err.response['Error']['Code']})"
@@ -190,11 +199,15 @@ def uso(ses) -> dict:
 def escenarios(p: dict[str, float], u: dict) -> None:
     seccion("3. Escenarios (USD, precios de lista antes de capas gratuitas y creditos)")
     hora = p["ec2_t3_medium_hora"] + p["ipv4_publica_hora"] + p["rds_t4g_micro_hora"] + p["docdb_t3_medium_hora"]
-    autores = max(u.get("autores_qs", 0), 1)
+    roles = u.get("roles_qs") or ["ADMIN"]
+    precio_rol = {"ADMIN": p["quicksight_autor_mes"], "AUTHOR": p["quicksight_autor_mes"],
+                  "ADMIN_PRO": p["quicksight_autor_pro_mes"], "AUTHOR_PRO": p["quicksight_autor_pro_mes"],
+                  "READER": p["quicksight_lector_mes"], "READER_PRO": p["quicksight_lector_pro_mes"]}
+    pro = any(r.endswith("_PRO") for r in roles)
     fijo = (30 * p["ebs_gp3_gb_mes"] + 20 * p["rds_gp3_gb_mes"] + 1 * p["docdb_almacenamiento_gb_mes"]
             + u.get("secretos", 6) * p["secreto_mes"] + max(u.get("s3_gb", 0), 0.1) * p["s3_standard_gb_mes"]
             + 1 * p["redshift_rms_gb_mes"])
-    qs = autores * p["quicksight_autor_mes"]
+    qs = sum(precio_rol.get(r, 0) for r in roles) + (p["quicksight_cuenta_con_pro_mes"] if pro else 0)
     rpu_lote = 0.5  # supuesto por lote del DW, comparar con la medicion de la seccion 2
     textos = 30 + 40 * 10  # carga inicial y 40 lotes del data lake con 10 textos nuevos cada uno
     comprehend = textos * 3 * 4 * p["comprehend_unidad"]  # 3 APIs, 4 unidades promedio por texto
@@ -208,7 +221,8 @@ def escenarios(p: dict[str, float], u: dict) -> None:
         ("Tope diario de Redshift (10 RPU-h)", f"{10 * p['redshift_rpu_hora']:.2f}",
          "el limite de uso desactiva el workgroup al llegar"),
         ("Mes con todo apagado", f"{fijo:.2f}", "discos, almacenamiento de bases, secretos y S3"),
-        (f"QuickSight, {autores} autor(es)", f"{qs:.2f}", "0 durante la prueba de 30 dias"),
+        (f"QuickSight despues de la prueba ({', '.join(roles)})", f"{qs:.2f}",
+         "incluye 250 USD por cuenta por tener un usuario Pro" if pro else "sin usuarios Pro"),
         (f"Mes de laboratorio ({lab_horas} h encendido, {lab_lotes_dw} lotes DW, 40 lotes DL)",
          f"{lab + fijo:.2f}", f"sin QuickSight; Comprehend {comprehend:.2f}, Athena {athena:.4f}"),
         ("Mes encendido sin parar (730 h)", f"{730 * hora + fijo:.2f}", "sin Redshift ni QuickSight"),

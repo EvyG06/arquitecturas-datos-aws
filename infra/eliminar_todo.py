@@ -190,8 +190,10 @@ def rds_mysql(ses) -> list[Recurso]:
                 reintentar(lambda: rds.delete_db_instance(DBInstanceIdentifier=RDS, SkipFinalSnapshot=True,
                                                           DeleteAutomatedBackups=True),
                            ("InvalidDBInstanceState", "InvalidDBInstanceStateFault"))
-        out.append(Recurso(1, "RDS for MySQL", RDS, inst["DBInstanceStatus"], borrar,
-                           lambda: esperar_waiter(rds, "db_instance_deleted", DBInstanceIdentifier=RDS), [RDS]))
+        # el secreto maestro lo administra RDS y se borra con la instancia
+        claves = [RDS, inst.get("DbiResourceId", ""), inst.get("MasterUserSecret", {}).get("SecretArn", "")]
+        out.append(Recurso(1, "RDS for MySQL (con su secreto maestro)", RDS, inst["DBInstanceStatus"], borrar,
+                           lambda: esperar_waiter(rds, "db_instance_deleted", DBInstanceIdentifier=RDS), claves))
     if si_existe(lambda: rds.describe_db_subnet_groups(DBSubnetGroupName=RDS_SUBREDES)["DBSubnetGroups"],
                  "DBSubnetGroupNotFoundFault"):
         out.append(Recurso(2, "RDS grupo de subredes", RDS_SUBREDES, "",
@@ -233,15 +235,16 @@ def documentdb(ses) -> list[Recurso]:
                 reintentar(lambda: doc.delete_db_instance(DBInstanceIdentifier=DOCDB_INSTANCIA), estados)
         out.append(Recurso(1, "DocumentDB instancia", DOCDB_INSTANCIA, inst["DBInstanceStatus"], borrar_instancia,
                            lambda: esperar_waiter(doc, "db_instance_deleted", DBInstanceIdentifier=DOCDB_INSTANCIA),
-                           [DOCDB_INSTANCIA]))
+                           [DOCDB_INSTANCIA, inst.get("DbiResourceId", "")]))
     if cl:
         def borrar_cluster() -> None:
             c = cluster()
             if c and c["Status"] != "deleting":
                 arrancar_si_detenido()
                 reintentar(lambda: doc.delete_db_cluster(DBClusterIdentifier=DOCDB, SkipFinalSnapshot=True), estados)
-        out.append(Recurso(2, "DocumentDB cluster", DOCDB, cl["Status"], borrar_cluster,
-                           lambda: esperar_hasta("cluster DocumentDB", lambda: cluster() is None), [DOCDB]))
+        claves = [DOCDB, cl.get("DbClusterResourceId", ""), cl.get("MasterUserSecret", {}).get("SecretArn", "")]
+        out.append(Recurso(2, "DocumentDB cluster (con su secreto maestro)", DOCDB, cl["Status"], borrar_cluster,
+                           lambda: esperar_hasta("cluster DocumentDB", lambda: cluster() is None), claves))
     if si_existe(lambda: doc.describe_db_subnet_groups(DBSubnetGroupName=DOCDB_SUBREDES)["DBSubnetGroups"],
                  "DBSubnetGroupNotFoundFault"):
         out.append(Recurso(3, "DocumentDB grupo de subredes", DOCDB_SUBREDES, "",
@@ -286,7 +289,7 @@ def redshift(ses) -> list[Recurso]:
         out.append(Recurso(2, "Redshift Serverless namespace (datos y secreto del admin)", REDSHIFT,
                            f"{ns.get('status')}, {len(fotos)} snapshot(s)", borrar_ns,
                            lambda: esperar_hasta("namespace de Redshift", lambda: namespace() is None),
-                           [f"namespace/{ns.get('namespaceId', REDSHIFT)}"]))
+                           [f"namespace/{ns.get('namespaceId', REDSHIFT)}", ns.get("adminPasswordSecretArn", "")]))
     return out
 
 
@@ -513,8 +516,27 @@ def imprimir(recursos: list[Recurso]) -> None:
 
 
 def no_cubiertos(arns: list[str], recursos: list[Recurso]) -> list[str]:
-    claves = [c for r in recursos for c in (r.claves or [r.nombre]) if c] + [f"budget/{PRESUPUESTO}"]
-    return [a for a in arns if not any(c in a for c in claves)]
+    claves = [c.lower() for r in recursos for c in (r.claves or [r.nombre]) if c] + [f"budget/{PRESUPUESTO}"]
+    return [a for a in arns if not any(c in a.lower() for c in claves)]
+
+
+def explicar(ses, arn: str) -> str:
+    """Que es un ARN etiquetado que no cubre el inventario. Los clusters de RDS pueden venir por id de recurso."""
+    partes = arn.split(":")
+    if partes[2] in ("rds", "docdb") and len(partes) > 6 and partes[5] == "cluster":
+        ident = partes[6]
+        filtro = "db-cluster-resource-id" if ident.startswith("cluster-") else "db-cluster-id"
+        rds = ses.client("rds")
+        try:
+            hallados = rds.describe_db_clusters(Filters=[{"Name": filtro, "Values": [ident.upper()
+                                                          if filtro == "db-cluster-resource-id" else ident]}])
+        except ClientError as err:
+            return f"no se pudo consultar ({codigo(err)})"
+        if not hallados["DBClusters"]:
+            return "no existe: la API de etiquetas aun lista un recurso ya borrado"
+        c = hallados["DBClusters"][0]
+        return f"cluster {c['DBClusterIdentifier']}, motor {c['Engine']}, estado {c['Status']}"
+    return ""
 
 
 def ejecutar(recursos: list[Recurso]) -> list[str]:
@@ -562,7 +584,8 @@ def main(argv: list[str] | None = None) -> int:
     sueltos = no_cubiertos(arns, recursos)
     print(f"\nRecursos con la etiqueta Project={PROYECTO}: {len(arns)}. No cubiertos por el inventario: {len(sueltos)}")
     for a in sueltos:
-        print(f"  {a}")
+        nota = explicar(ses, a)
+        print(f"  {a}" + (f"\n    {nota}" if nota else ""))
     print("\nPara revisar a mano:")
     for nota in informativos(ses):
         print(f"  {nota}")

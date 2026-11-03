@@ -1,6 +1,6 @@
 # Estimación de costos
 
-Precios de lista bajo demanda en us-east-2, antes de capas gratuitas y créditos. `python infra/costos.py` vuelve a consultar los precios en la AWS Price List API, mide el uso real de la cuenta y trae el gasto de Cost Explorer. Su última salida está en [evidencias/costos/01_costos.txt](../evidencias/costos/01_costos.txt).
+Precios de lista bajo demanda en us-east-2, antes de capas gratuitas y créditos. Los de EC2, EBS, IPv4, RDS, DocumentDB, S3 y Secrets Manager coinciden con la AWS Price List API en la última corrida. `python infra/costos.py` vuelve a consultar los precios en la AWS Price List API, mide el uso real de la cuenta y trae el gasto de Cost Explorer. Su última salida está en [evidencias/costos/01_costos.txt](../evidencias/costos/01_costos.txt).
 
 ## Precios unitarios
 
@@ -15,7 +15,7 @@ Precios de lista bajo demanda en us-east-2, antes de capas gratuitas y créditos
 | DocumentDB almacenamiento e I/O | Menos de 1 GB | 0.10 USD por GB-mes y 0.20 USD por millón de I/O | Misma página |
 | Redshift Serverless | 4 RPU de base y de máximo | 0.375 USD por RPU-hora, por segundo con mínimo de 60 s | [Redshift](https://aws.amazon.com/redshift/pricing/) |
 | Redshift Managed Storage | Menos de 1 GB | 0.024 USD por GB-mes | Misma página |
-| QuickSight Enterprise | Autores del dashboard | 24 USD por autor al mes, con 10 GB de SPICE incluidos | [QuickSight](https://aws.amazon.com/quicksuite/quicksight/pricing) |
+| QuickSight Enterprise | Autores del dashboard | 24 USD por autor al mes con 10 GB de SPICE. Autor Pro 40 USD, y con un solo usuario Pro la cuenta paga además 250 USD al mes | [QuickSight](https://aws.amazon.com/quicksuite/quicksight/pricing) |
 | Comprehend | Idioma, entidades y frases clave | 0.0001 USD por unidad de 100 caracteres, mínimo 3 unidades por documento | [Comprehend](https://aws.amazon.com/comprehend/pricing/) |
 | Athena | Consultas y validaciones del data lake | 5 USD por TB escaneado, mínimo 10 MB por consulta | [Athena](https://aws.amazon.com/athena/pricing/) |
 | S3 Standard | Los dos buckets, menos de 100 MB | 0.023 USD por GB-mes | [S3](https://aws.amazon.com/s3/pricing/) |
@@ -32,7 +32,7 @@ Sin costo en este volumen. Glue Data Catalog (el primer millón de objetos y de 
 | Tope diario de Redshift | 3.75 | 10 RPU-horas, al llegar el límite de uso desactiva el workgroup |
 | Un mes con todo apagado | 7.23 | Discos (2.40 + 2.30), secretos (2.40), almacenamiento de DocumentDB, Redshift y S3 (0.13) |
 | Mes de laboratorio | 12.44 | 20 horas encendido (2.81), 10 lotes del DW (1.88), 40 lotes del data lake con Comprehend (0.52) y Athena (0.02), más el mes apagado |
-| QuickSight después de la prueba | 24 por autor | La suscripción tiene dos autores, el usuario IAM y root, así que serían 48 |
+| QuickSight después de la prueba | 48 | Dos autores, el usuario IAM y root. Con el usuario IAM en ADMIN_PRO, como quedó al crear la suscripción, serían 314 (24 + 40 + 250), por eso `infra/dw/09_quicksight_sin_pro.sh` le quita el rol Pro |
 | Un mes encendido sin parar | 109.86 | 730 horas encendido más el mes apagado, sin Redshift ni QuickSight |
 
 El costo lo deciden las horas encendidas. Por eso `./infra/detener.sh` se corre al final de cada sesión, y el último escenario muestra lo que costaría olvidarlo.
@@ -63,11 +63,21 @@ El presupuesto de 40 USD mide el costo sin créditos (`IncludeCredit: false`), a
 | Gold recalcula solo las fechas que cambiaron y Silver solo reescribe las fechas tocadas | `gold.py`, `silver.py` |
 | Particiones por fecha para que Athena lea solo los días consultados | `data-lake/src/dl/catalog.py` |
 | Ciclo de vida que borra versiones viejas de S3 a los 7 días y los resultados de Athena a los 7 días | Scripts de los buckets |
-| QuickSight Enterprise sin usuarios Pro ni Q, que activarían la tarifa de 250 USD al mes por cuenta | `infra/dw/07_quicksight.sh` |
+| QuickSight Enterprise sin usuarios Pro ni Q, que activarían la tarifa de 250 USD al mes por cuenta. `costos.py` lista los roles y `09_quicksight_sin_pro.sh` quita el rol Pro que asigna la suscripción | `infra/dw/07_quicksight.sh`, `09_quicksight_sin_pro.sh` |
 | Un NAT Gateway costaría unos 33 USD al mes, más que todo el laboratorio. La EC2 sale por su IP pública sin reglas de entrada | `infra/ec2/01_instancia.sh` |
 
 RDS y DocumentDB se vuelven a encender solos a los 7 días de detenidos. Si el laboratorio se pausa más tiempo, hay que detenerlos otra vez o eliminar todo con `python infra/eliminar_todo.py --ejecutar`.
 
 ## Gasto real
 
-Se completa con la salida de `python infra/costos.py`.
+Corte del 2 de noviembre de 2026 a las 20:14 hora de Bogotá, de [evidencias/costos/01_costos.txt](../evidencias/costos/01_costos.txt).
+
+| Fuente | Valor | Lectura |
+|---|---|---|
+| Cost Explorer, octubre | 0.60 USD de uso, todo cubierto por créditos | Secrets Manager 0.44, RDS 0.12 y Cost Explorer 0.04 |
+| Cost Explorer, noviembre | 0.01 USD de uso, cubierto por créditos | Cost Explorer tarda hasta 24 horas, así que todavía no aparece el trabajo del 1 y 2 de noviembre en EC2, DocumentDB y Redshift |
+| Presupuesto (sin créditos) | 0.005 USD gastados y 0.18 USD de pronóstico para el mes | Muy lejos del límite de 40 |
+| Redshift Serverless (CloudWatch `ComputeSeconds`) | 0.99 RPU-horas en el mes, 0.37 USD de lista | Incluye cargas, corridas de dbt y ejecuciones del DAG de las fases 5 a 7, y lo cubre el crédito de 300 USD |
+| QuickSight | 2 usuarios, root como ADMIN y el usuario IAM como ADMIN_PRO | 0 durante la prueba. Sin corregir el rol Pro serían 314 USD al mes después. El estado tras `09_quicksight_sin_pro.sh` está en [02_costos_sin_pro.txt](../evidencias/costos/02_costos_sin_pro.txt) |
+
+La medición de Redshift sugiere que el supuesto de 0.5 RPU-hora por lote es conservador. Se mantiene en la estimación hasta que Cost Explorer confirme el consumo real de esos días.

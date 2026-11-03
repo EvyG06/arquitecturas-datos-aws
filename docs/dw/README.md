@@ -97,7 +97,7 @@ Todo corre desde el Mac con el alias `arq`, que activa el entorno conda y carga 
 | 4 | `infra/iam/04_rol_fuentes.sh`, `02_ec2_role.sh`, `03_dw_access.sh` | Rol del sistema de origen simulado y permisos del pipeline sobre el DW |
 | 5 | En la EC2: `dw.sh sources.create_schema`, `sources.cdc`, `sources.generate_data`, `sources.create_readers` | Esquemas, columna CDC, datos (seed 42) y usuarios de solo lectura |
 | 6 | `infra/dw/04_redshift.sh`, `infra/iam/05_redshift_access.sh`, `python infra/dw/05_redshift_bootstrap.py` | Redshift Serverless, rol de COPY, tope de uso y usuario del pipeline |
-| 7 | `infra/dw/07_quicksight.sh`, `python infra/dw/06_bi_lector.py`, `python infra/dw/08_quicksight_recursos.py` | QuickSight, conexión VPC, `bi_lector`, dataset y dashboard |
+| 7 | `infra/dw/07_quicksight.sh`, `infra/dw/09_quicksight_sin_pro.sh`, `python infra/dw/06_bi_lector.py`, `python infra/dw/08_quicksight_recursos.py` | QuickSight sin usuarios Pro, conexión VPC, `bi_lector`, dataset y dashboard |
 
 Los scripts `infra/dw/fase4a.sh` a `fase7.sh` ejecutan cada fase completa con sus escenarios y guardan la evidencia. Son la forma reproducible de llegar al mismo estado de las evidencias.
 
