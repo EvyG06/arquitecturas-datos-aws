@@ -1,7 +1,7 @@
 # Arquitecturas de datos en AWS
 
 Actividad de Ingeniería de Datos 2026-2 (Universidad EIA). 
-Integrantes: Pablo Restrepo y Evelyn Gómez
+- Integrantes: Pablo Restrepo y Evelyn Gómez
 
 - **Data lake de noticias.** Tres feeds RSS de El Tiempo a una arquitectura medallón en S3, con Comprehend, Glue y Athena. [Documentación](docs/dl/README.md).
 - **Data warehouse de e-commerce.** El DW local de DE-DW migrado a RDS for MySQL, DocumentDB, S3, Redshift Serverless, dbt y QuickSight. [Documentación](docs/dw/README.md).
