@@ -4,6 +4,7 @@
 La contrasena de bi_lector se lee de Secrets Manager y va directo a la API: no pasa por la terminal ni por los
 argumentos de ningun proceso. El dashboard lee solo marts.ventas_dashboard, la unica tabla que bi_lector puede leer.
 Con --validar solo arma las peticiones y las valida contra el modelo de la API, sin llamar a AWS.
+Con --compartir USUARIO da a otro usuario de QuickSight los mismos permisos de dueno sobre los cuatro recursos.
 """
 from __future__ import annotations
 
@@ -171,6 +172,34 @@ def validate(reqs: dict) -> None:
         print(f"ok  {create} y {update}")
 
 
+SHARE = {  # recurso: (metodo de boto3, operacion de la API, parametro de id, id)
+    "data_source": ("update_data_source_permissions", "UpdateDataSourcePermissions", "DataSourceId", DATA_SOURCE_ID),
+    "dataset": ("update_data_set_permissions", "UpdateDataSetPermissions", "DataSetId", DATASET_ID),
+    "analysis": ("update_analysis_permissions", "UpdateAnalysisPermissions", "AnalysisId", ANALYSIS_ID),
+    "dashboard": ("update_dashboard_permissions", "UpdateDashboardPermissions", "DashboardId", DASHBOARD_ID),
+}
+
+
+def share(qs, account: str, user_name: str, validate_only: bool = False) -> None:
+    """Agrega permisos de dueno para otro usuario de QuickSight, sin quitar los que ya existen."""
+    if validate_only:
+        import botocore.session
+        from botocore.validate import validate_parameters
+
+        model = botocore.session.get_session().get_service_model("quicksight")
+        arn = f"arn:aws:quicksight:us-east-2:{account}:user/default/{user_name}"
+    else:
+        arn = qs.describe_user(AwsAccountId=account, Namespace="default", UserName=user_name)["User"]["Arn"]
+    for kind, (method, operation, key, ident) in SHARE.items():
+        req = {"AwsAccountId": account, key: ident, "GrantPermissions": [{"Principal": arn, "Actions": ACTIONS[kind]}]}
+        if validate_only:
+            validate_parameters(req, model.operation_model(operation).input_shape)
+            print(f"ok  {operation}")
+        else:
+            getattr(qs, method)(**req)
+            print(f"{kind}: permisos de dueno para {arn}")
+
+
 def wait(fn, done, failed, what: str, timeout: int = 600):
     start = time.monotonic()
     while True:
@@ -187,11 +216,17 @@ def wait(fn, done, failed, what: str, timeout: int = 600):
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--validar", action="store_true", help="Valida las peticiones contra el modelo, sin AWS")
+    parser.add_argument("--compartir", metavar="USUARIO", help="Usuario de QuickSight que recibe permisos de dueno")
     args = parser.parse_args()
     if args.validar:
         p = {"quicksight_user_arn": "arn:aws:quicksight:us-east-2:1:user/default/x", "redshift_host": "h",
              "redshift_database": "db", "quicksight_vpc_connection_arn": "arn:aws:quicksight:us-east-2:1:vpcConnection/v"}
         validate(requests("123456789012", "us-east-2", p, None))
+        share(None, "123456789012", "726168540074", validate_only=True)
+        return 0
+    if args.compartir:
+        share(boto3.client("quicksight"), boto3.client("sts").get_caller_identity()["Account"], args.compartir)
+        print(f"\nAbre https://{boto3.session.Session().region_name}.quicksight.aws.amazon.com/sn/dashboards/{DASHBOARD_ID}")
         return 0
 
     session = boto3.session.Session()
