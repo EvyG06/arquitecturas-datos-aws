@@ -1,0 +1,10 @@
+fuente de datos creada
+dataset SPICE creado
+SPICE COMPLETED: 271 filas, 0 descartadas
+analysis creado
+dashboard creado
+
+dashboard publicado (version 1):
+  https://us-east-2.quicksight.aws.amazon.com/sn/dashboards/arq-datos-ventas
+analisis para editarlo:
+  https://us-east-2.quicksight.aws.amazon.com/sn/analyses/arq-datos-ventas-analisis

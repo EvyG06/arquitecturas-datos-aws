@@ -1,0 +1,5 @@
+00:05:37 manual__demo_dashboard_20261102T235625Z: running
+00:07:56 manual__demo_dashboard_20261102T235625Z: running
+00:09:39 manual__demo_dashboard_20261102T235625Z: success
+	
+[ssm e2146cb2-93f8-4572-b2ab-fcf439655179 | estado Success | codigo 0]

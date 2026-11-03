@@ -1,0 +1,27 @@
+[0m00:03:33  
+[0m00:03:33  Concurrency: 4 threads (target='aws')
+[0m00:03:33  
+[0m00:03:36  1 of 8 START sql table model marts.ventas_dashboard ............................ [RUN]
+[0m00:03:39  1 of 8 OK created sql table model marts.ventas_dashboard ....................... [[32mSUCCESS[0m in 3.00s]
+[0m00:03:40  2 of 8 START test assert_dashboard_matches_fct_sales ........................... [RUN]
+[0m00:03:40  3 of 8 START test not_null_ventas_dashboard_canal .............................. [RUN]
+[0m00:03:40  4 of 8 START test not_null_ventas_dashboard_categoria .......................... [RUN]
+[0m00:03:40  5 of 8 START test not_null_ventas_dashboard_fecha .............................. [RUN]
+[0m00:03:41  4 of 8 PASS not_null_ventas_dashboard_categoria ................................ [[32mPASS[0m in 1.35s]
+[0m00:03:41  6 of 8 START test not_null_ventas_dashboard_sale_sk ............................ [RUN]
+[0m00:03:41  5 of 8 PASS not_null_ventas_dashboard_fecha .................................... [[32mPASS[0m in 1.38s]
+[0m00:03:41  7 of 8 START test not_null_ventas_dashboard_subtotal ........................... [RUN]
+[0m00:03:41  3 of 8 PASS not_null_ventas_dashboard_canal .................................... [[32mPASS[0m in 1.58s]
+[0m00:03:41  8 of 8 START test unique_ventas_dashboard_sale_sk .............................. [RUN]
+[0m00:03:42  2 of 8 PASS assert_dashboard_matches_fct_sales ................................. [[32mPASS[0m in 2.60s]
+[0m00:03:42  6 of 8 PASS not_null_ventas_dashboard_sale_sk .................................. [[32mPASS[0m in 1.55s]
+[0m00:03:43  8 of 8 PASS unique_ventas_dashboard_sale_sk .................................... [[32mPASS[0m in 1.46s]
+[0m00:03:43  7 of 8 PASS not_null_ventas_dashboard_subtotal ................................. [[32mPASS[0m in 1.68s]
+[0m00:03:43  
+[0m00:03:43  Finished running 1 table model, 7 data tests in 0 hours 0 minutes and 9.99 seconds (9.99s).
+[0m00:03:43  
+[0m00:03:43  [32mCompleted successfully[0m
+[0m00:03:43  
+[0m00:03:43  Done. PASS=8 WARN=0 ERROR=0 SKIP=0 TOTAL=8
+	
+[ssm 85089a98-3f0c-4b78-80b2-ba68147fa346 | estado Success | codigo 0]

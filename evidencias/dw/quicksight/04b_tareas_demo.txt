@@ -1,0 +1,18 @@
+manual__demo_dashboard_20261102T235625Z | manual | success | conf {}
+tarea                    estado           intentos  segundos
+validar_configuracion    success                 1         3
+extraer_mysql            success                 1         5
+extraer_documentdb       success                 1         6
+registrar_lote_s3        success                 1         2
+cargar_redshift          success                 1        17
+dbt_seed                 success                 1        18
+dbt_run_intermediate     success                 1        55
+dbt_run_quarantine       success                 1        21
+dbt_snapshot             success                 1        13
+dbt_run_marts            success                 1        28
+dbt_test                 success                 1        36
+validar_conciliacion     success                 1         7
+refrescar_quicksight     success                 1        24
+registrar_resultado      success                 1         1
+	
+[ssm 90d6edf6-67bd-45c9-9851-b406d36a6153 | estado Success | codigo 0]

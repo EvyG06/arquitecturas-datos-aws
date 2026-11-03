@@ -1,0 +1,8 @@
+== attempt=1.log
+[2026-11-03T00:09:03.744+0000] {subprocess.py:88} INFO - Running command: ['/usr/bin/bash', '-c', 'echo "batch_id=$LOTE tarea=refrescar_quicksight intento=$INTENTO${REPROCESAR:+ modo=reproceso}"\nexec /home/airflow/dw-venv/bin/python -m eco
+[2026-11-03T00:09:03.767+0000] {subprocess.py:106} INFO - batch_id=manual__demo_dashboard_20261102T235625Z tarea=refrescar_quicksight intento=1
+[2026-11-03T00:09:06.208+0000] {subprocess.py:106} INFO - batch_id=manual__demo_dashboard_20261102T235625Z refresco SPICE iniciado dataset=arq-datos-ventas ingestion=manual__demo_dashboard_20261102T235625Z-1793664545
+[2026-11-03T00:09:26.689+0000] {subprocess.py:106} INFO - batch_id=manual__demo_dashboard_20261102T235625Z refresco SPICE completo filas=274 descartadas=0 segundos=13
+[2026-11-03T00:09:26.861+0000] {taskinstance.py:361} INFO - Marking task as SUCCESS. dag_id=dw_ecommerce, task_id=refrescar_quicksight, run_id=manual__demo_dashboard_20261102T235625Z, execution_date=20261103T000525, start_date=20261103T0009
+	
+[ssm 6c24869c-5eec-4d3d-999c-0f8e9ecdaed4 | estado Success | codigo 0]

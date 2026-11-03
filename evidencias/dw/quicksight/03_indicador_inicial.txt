@@ -1,0 +1,9 @@
+
+## indicador
+filtro             lineas  ventas_totales  actualizado_en (UTC)
+Todos los canales  271     7674611.22      2026-11-03 00:03:28 
+canal = móvil      80      2376204.38      2026-11-03 00:03:28 
+canal = tienda     115     3394029.39      2026-11-03 00:03:28 
+canal = web        76      1904377.45      2026-11-03 00:03:28 
+	
+[ssm ee0296fb-cbe4-423e-9607-111e7766d631 | estado Success | codigo 0]
